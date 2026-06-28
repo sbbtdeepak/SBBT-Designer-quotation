@@ -165,11 +165,11 @@ for item in floor_data:
         <td style="padding: 12px; font-size: 14px; color: #111827; font-weight: 500;">{item['floor']}</td>
         <td style="padding: 12px; font-size: 14px; color: #4b5563;">{item['package']}</td>
         <td style="padding: 12px; font-size: 14px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
-        <td style="padding: 12px; font-size: 14px; color: #111827; text-align: right; font-weight: 600;">₹ {subtotal:,.2f} <span style="font-size:11px; color:#6b7280; font-weight:normal;">(Inc. GST @ ₹{item['rate']})</span></td>
+        <td style="padding: 12px; font-size: 14px; color: #111827; text-align: right; font-weight: 600;">₹ {subtotal:,.2f} <span style="font-size:11px; color:#6b7280; font-weight:normal;">(Inc. GST)</span></td>
     </tr>
     """
 
-# 8. MASTER PROPOSAL HTML GENERATION
+# 8. MASTER PROPOSAL HTML CONTAINER
 proposal_html = f"""
 <div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 850px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
     
@@ -252,33 +252,21 @@ proposal_html = f"""
 </div>
 """
 
-# HTML Template Wrapper with Print Auto-Trigger for standalone download
-full_downloadable_html = f"""<!DOCTYPE html>
-<html>
-<head>
-<title>SBBT_Official_Proposal</title>
-<meta charset="utf-8">
-</head>
-<body style="margin:0; padding:20px; background-color:#ffffff;">
-{proposal_html}
-<script>window.onload = function() { window.print(); }</script>
-</body>
-</html>"""
+# Safe standalone page layout without Python f-string conflict
+full_html_page = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='margin:0; padding:20px; background-color:#ffffff;'>{proposal_html}</body></html>"
 
-# 9. LIVE DASHBOARD INTERFACE
+# 9. LIVE PREVIEW & DOWNLOAD
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
-st.caption("👇 Neeche click karke designer copy download karein. File open karte hi automatic print/PDF option khul jayega:")
 
-# Safe Download Trigger
+# Safe Native Streamlit Download Button
 st.download_button(
-    label="📥 Download Designer Proposal",
-    data=full_downloadable_html,
-    file_name="SBBT_Official_Proposal.html",
+    label="📥 Download Designer Proposal (.html)",
+    data=full_html_page,
+    file_name="SBBT_Official_Quotation.html",
     mime="text/html",
     type="primary"
 )
 
 st.write("")
-# Safely displays the luxury design right inside Streamlit dashboard
 st.markdown(proposal_html, unsafe_allow_html=True)
