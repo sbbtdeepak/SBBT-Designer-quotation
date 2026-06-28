@@ -99,10 +99,10 @@ for i in range(total_floors):
     f_rate = st.number_input(f"Custom Rate for {floor_label} (₹/PSF)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_{i}")
     
     floor_data.append({
-        "floor": floor_label, 
-        "package": selected_global_display, 
-        "area": plot_area_ft, 
-        "rate": f_rate
+        "Floor Profile": floor_label, 
+        "Package Profile": selected_global_display, 
+        "Area (Sq.Ft)": plot_area_ft, 
+        "Rate (₹/PSF)": f_rate
     })
 
 st.write("---")
@@ -117,121 +117,79 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 
 # 5. MATHEMATICAL COMPUTATION
 total_built_up = plot_area_ft * total_floors
-net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
+net_project_cost = sum(item['Area (Sq.Ft)'] * item['Rate (₹/PSF)'] for item in floor_data)
 
-# 6. EXCEL SPECIFICATIONS GENERATION FOR HTML EMBED
-excel_specs_html = ""
-if df_matrix is not None:
-    excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#1f2937;'>📦 Specifications Matrix for {selected_global_display}:</div><ul style='margin-top:5px; padding-left:20px; font-size:14px; color:#4b5563; line-height:1.6;'>"
-    for idx, row in df_matrix.iterrows():
-        category = row['Category / Element']
-        spec_detail = row[selected_excel_col]
-        if pd.notna(spec_detail) and "Excluded" not in str(spec_detail):
-            excel_specs_html += f"<li><b>{category}:</b> {spec_detail}</li>"
-    excel_specs_html += "</ul>"
-else:
-    excel_specs_html = "<p style='color:#ef4444; font-size:14px;'>ℹ️ Excel File (SBBT_Master_Quotation_Matrix.xlsx) not found in root path.</p>"
+# Convert data to clean DataFrame for breakout view
+df_display = pd.DataFrame(floor_data)
+df_display["Subtotal Amount (INR)"] = df_display["Area (Sq.Ft)"] * df_display["Rate (₹/PSF)"]
+df_display["Subtotal Amount (INR)"] = df_display["Subtotal Amount (INR)"].map("₹ {:,.2f}".format)
 
-# 7. GENERATING PREMIUM PDF-STYLE HTML BREAKOUT (CRASH-PROOF & INLINE CALCULATION)
-table_rows_html = ""
-for item in floor_data:
-    subtotal = item['area'] * item['rate']
-    table_rows_html += f"""
-    <tr style="border-bottom: 1px solid #e5e7eb;">
-        <td style="padding: 10px; font-size: 14px; color: #1f2937; font-weight: 500;">{item['floor']}</td>
-        <td style="padding: 10px; font-size: 14px; color: #4b5563;">{item['package']}</td>
-        <td style="padding: 10px; font-size: 14px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
-        <td style="padding: 10px; font-size: 14px; color: #1f2937; text-align: right; font-weight: 600;">₹ {subtotal:,.2f} <span style="font-size:11px; color:#6b7280; font-weight:normal;">(@ ₹{item['rate']})</span></td>
-    </tr>
-    """
-
-# MASTER HTML TEMPLATE CONTAINER
-proposal_html = f"""
-<div style="background-color: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px; padding: 25px; font-family: 'Segoe UI', Arial, sans-serif; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-    
-    <div style="text-align: center; border-bottom: 2px solid #111827; padding-bottom: 15px;">
-        <h2 style="margin: 0; color: #111827; letter-spacing: 1px; font-size: 24px; font-weight: 700;">SHREE BADREE BUILD TECH PVT. LTD.</h2>
-        <div style="font-size: 11px; color: #4b5563; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px;">WHERE VISION MEETS PRECISION • TRUSTED SINCE 2011</div>
-        <div style="font-size: 12px; color: #2563eb; font-weight: 500; margin-top: 2px;">⭐ Google Rating: 4.9/5.0 (50+ Happy Families)</div>
-    </div>
-
-    <div style="margin-top: 20px; display: flex; justify-content: space-between; font-size: 13px; line-height: 1.6; color: #374151;">
-        <div style="flex: 1;">
-            <b>Quotation Ref:</b> SBBT/Q/{datetime.date.today().year}/092<br>
-            <b>Client Name:</b> {client_name}<br>
-            <b>Project Site Location:</b> {project_address}
-        </div>
-        <div style="flex: 1; text-align: right;">
-            <b>Date Issued:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
-            <b>Plot Size:</b> {plot_area_yd} Sq. Yards ({plot_area_ft} Sq. Ft.)<br>
-            <b>Total Built-up Area:</b> {total_built_up:,} Sq. Ft. ({total_floors} Floors)
-        </div>
-    </div>
-
-    <div style="margin-top: 20px; background-color: #f3f4f6; border-left: 4px solid #2563eb; padding: 12px; font-style: italic; font-size: 13px; color: #1f2937; border-radius: 0 4px 4px 0;">
-        "{custom_note}"
-    </div>
-
-    <div style="margin-top: 25px;">
-        <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #111827;">📋 ITEM-WISE ARCHITECTURAL COST BREAKOUT:</div>
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="background-color: #111827; color: #ffffff;">
-                    <th style="padding: 10px; font-size: 13px; border-radius: 4px 0 0 0;">Floor Profile</th>
-                    <th style="padding: 10px; font-size: 13px;">Selected Package</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: center;">Area (Sq.Ft)</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: right; border-radius: 0 4px 0 0;">Subtotal (INR)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {table_rows_html}
-            </tbody>
-        </table>
-    </div>
-
-    <div style="margin-top: 20px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold; font-size: 14px; color: #1e40af;">TOTAL ESTIMATED CONSTRUCTION COST (Excl. GST):</span>
-        <span style="font-size: 22px; font-weight: 700; color: #1e3a8a;">₹ {net_project_cost:,.2f}</span>
-    </div>
-
-    <div style="margin-top: 20px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 12px; font-size: 13px; color: #78350f;">
-        <b>⚙️ STRUCTURAL EXTRA ADVANTAGES & COMMITMENTS:</b><br>
-        <span style="color: #92400e;">{additional_reqs}</span>
-    </div>
-
-    <div style="margin-top: 20px; border-top: 1px dashed #d1d5db; padding-top: 15px;">
-        {excel_specs_html}
-    </div>
-
-    <div style="margin-top: 20px; border-top: 1px dashed #d1d5db; padding-top: 15px; font-size: 12px; color: #4b5563; line-height: 1.5;">
-        <b>🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:</b>
-        <ul style="margin: 5px 0 0 0; padding-left: 18px;">
-            <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.</li>
-            <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.</li>
-            <li><b>Quality Governance:</b> End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.</li>
-        </ul>
-    </div>
-
-    <div style="margin-top: 30px; border-top: 1px solid #111827; padding-top: 15px; display: flex; justify-content: space-between; font-size: 12px; color: #374151;">
-        <div>
-            <br>
-            <span style="font-size: 11px; color: #6b7280; font-style: italic;">Authorized Signatory</span><br>
-            <b>Shree Badree Build Tech Pvt. Ltd.</b>
-        </div>
-        <div style="text-align: right; line-height: 1.5;">
-            📞 <b>Contact:</b> +91 8800614403, 9625803339<br>
-            📧 <b>Email:</b> deeep1sharma@gmail.com<br>
-            <span style="color: #6b7280; font-size:11px;">Building Trust Through Quality & Transparency</span>
-        </div>
-    </div>
-
-</div>
-"""
-
-# 8. RENDER HTML PREVIEW SAFELY
+# 6. ELEGANT EXECUTIVE PROPOSAL DISPLAY
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
-st.caption("💡 Tip: Press **Ctrl + P** on this page to save or print this proposal as a clean corporate PDF.")
+st.caption("💡 Tip: Click on the preview block below and press **Ctrl + P** to save or print cleanly.")
 
-# Using safe native component to display the HTML Proposal (No refresh lag)
-st.components.v1.html(proposal_html, height=1100, scroller=True)
+with st.container(border=True):
+    # Corporate Identity Header
+    st.subheader("SHREE BADREE BUILD TECH PVT. LTD.")
+    st.caption("WHERE VISION MEETS PRECISION • TRUSTED SINCE 2011")
+    st.write(f"**Google Rating:** 4.9/5.0 (50+ Happy Families)")
+    st.write("---")
+    
+    # Meta Details columns
+    m1, m2 = st.columns(2)
+    with m1:
+        st.write(f"**Quotation Ref:** SBBT/Q/{datetime.date.today().year}/092")
+        st.write(f"**Client Name:** {client_name}")
+        st.write(f"**Project Site Location:** {project_address}")
+    with m2:
+        st.write(f"**Date Issued:** {datetime.date.today().strftime('%d %B %Y')}")
+        st.write(f"**Plot Size:** {plot_area_yd} Sq. Yards ({plot_area_ft} Sq. Ft.)")
+        st.write(f"**Total Built-up Area:** {total_built_up:,} Sq. Ft. ({total_floors} Floors)")
+        
+    st.write("---")
+    
+    # Executive Narrative Box
+    st.info(f"\"{custom_note}\"")
+    st.write("")
+    
+    st.write("**📋 DETAILED ARCHITECTURAL COST BREAKOUT:**")
+    # FIX: Corrected parameters to avoid the keyword parsing crash shown in screenshot
+    st.dataframe(df_display, hide_index=True, use_container_width=True)
+        
+    st.write("")
+    st.metric(label="TOTAL ESTIMATED CONSTRUCTION COST (Excl. GST)", value=f"₹ {net_project_cost:,.2f}")
+    st.write("---")
+    
+    # Section: Strategy & Commitments
+    st.write("**⚙️ STRUCTURAL EXTRA ADVANTAGES & COMMITMENTS:**")
+    st.warning(additional_reqs)
+    st.write("---")
+    
+    # DYNAMIC EXCEL MATERIAL SPECIFICATIONS FETCHING
+    st.write("**🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX (FROM EXCEL):**")
+    
+    if df_matrix is not None:
+        st.markdown(f"### 📦 Specifications for **{selected_global_display}**:")
+        
+        for idx, row in df_matrix.iterrows():
+            category = row['Category / Element']
+            spec_detail = row[selected_excel_col]
+            
+            if pd.notna(spec_detail) and "Excluded" not in str(spec_detail):
+                st.markdown(f"* **{category}:** {spec_detail}")
+    else:
+        st.info("ℹ️ Excel Data Stream offline hai. Please check karein ki 'SBBT_Master_Quotation_Matrix.xlsx' repository ke main folder me uploaded hai.")
+
+    st.write("---")
+    
+    # Signature Grid
+    f1, f2 = st.columns(2)
+    with f1:
+        st.write("")
+        st.caption("Authorized Signatory")
+        st.write("**Shree Badree Build Tech Pvt. Ltd.**")
+    with f2:
+        st.write("📞 **Contact:** +91 8800614403, 9625803339")
+        st.write("📧 **Email:** deeep1sharma@gmail.com")
+        st.caption("Building Trust Through Quality & Transparency")
