@@ -45,19 +45,19 @@ st.write("---")
 # Section 1: Client Profile Matrix & Global Package Selection
 st.subheader("👤 Step 1: Project & Package Profile")
 
-# Mapping dropdown keys directly to match your Excel column names exactly
+# Mapping dropdown keys directly to match Excel column names
 package_options = {
-    "Solid Structure Core (₹1199)": "Core Shell Package", 
-    "Essential Finishing (₹1699)": "Essential Package", 
-    "Premium Luxury Profile (₹2099)": "Premium Luxury Package"
+    "Solid Structure Core": "Core Shell Package", 
+    "Essential Finishing": "Essential Package", 
+    "Premium Luxury Profile": "Premium Luxury Package"
 }
 
 c_col1, c_col2 = st.columns(2)
 with c_col1:
     client_name = st.text_input("Client Name", "Mr. & Mrs. Sharma")
     project_address = st.text_input("Site Location/Address", "Palam, Gurgaon (HR)")
-    # SHIFTED UP: Global package selection for all floors
-    selected_global_display = st.selectbox("Select Master Project Package", list(package_options.keys()), index=2)
+    # Global package selection for all floors
+    selected_global_display = st.selectbox("Select Project Master Package", list(package_options.keys()), index=2)
     selected_excel_col = package_options[selected_global_display]
 
 with c_col2:
@@ -71,11 +71,11 @@ st.write("---")
 
 # Section 2: Floor-Wise Detail Matrix Configuration (Rates Only)
 st.subheader("📐 Step 2: Custom Floor Rates")
-st.caption(f"Note: All floors are automatically assigned to **{selected_global_display.split(' (')[0]}** with an area of **{plot_area_ft} Sq.Ft.**")
+st.caption(f"Note: All floors are automatically assigned to **{selected_global_display}** with an area of **{plot_area_ft} Sq.Ft.**")
 
 floor_data = []
 
-# Dynamic rate configuration fields based on global package choice
+# Dynamic rate configuration based on global package choice
 for i in range(total_floors):
     if i == 0:
         floor_label = "Ground Floor / Stilt"
@@ -88,7 +88,7 @@ for i in range(total_floors):
     else:
         floor_label = f"{i}th Floor"
         
-    # Standard base validation check based on the choice from top
+    # Validation default rates based on global package selection
     if "Solid Structure" in selected_global_display:
         min_p, max_p, def_p = 1100, 1500, 1199
     elif "Essential" in selected_global_display:
@@ -100,7 +100,7 @@ for i in range(total_floors):
     
     floor_data.append({
         "Floor Profile": floor_label, 
-        "Package Profile": selected_global_display.split(" (")[0], 
+        "Package Profile": selected_global_display, 
         "Area (Sq.Ft)": plot_area_ft, 
         "Rate (₹/PSF)": f_rate
     })
@@ -169,7 +169,7 @@ with st.container(border=True):
     st.write("**🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX (FROM EXCEL):**")
     
     if df_matrix is not None:
-        st.markdown(f"### 📦 Specifications for **{selected_global_display.split(' (')[0]}**:")
+        st.markdown(f"### 📦 Specifications for **{selected_global_display}**:")
         
         for idx, row in df_matrix.iterrows():
             category = row['Category / Element']
@@ -178,7 +178,7 @@ with st.container(border=True):
             if pd.notna(spec_detail) and "Excluded" not in str(spec_detail):
                 st.markdown(f"* **{category}:** {spec_detail}")
     else:
-        st.info("ℹ️ Excel Data Stream offline hai. Please check karein ki 'SBBT_Master_Quotation_Matrix.xlsx' root repository folder me uploaded hai.")
+        st.info("ℹ️ Excel Data Stream offline hai. Please check karein ki 'SBBT_Master_Quotation_Matrix.xlsx' repository ke main folder me uploaded hai.")
 
     st.write("---")
     
