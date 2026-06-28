@@ -1,18 +1,31 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import os
 
 # 1. PAGE LAYOUT CONFIGURATION
 st.set_page_config(page_title="SBBT Premium Quotation Engine", page_icon="🏗️", layout="centered")
 
-# 2. BACKGROUND ENGINE: EXCEL SHEET READER
+# 2. AUTOMATIC & FLEXIBLE EXCEL SHEET READER
 @st.cache_data
 def load_sbbt_matrix():
-    try:
-        df = pd.read_excel("SBBT_Master_Quotation_Matrix.xlsx", sheet_name="AI Master Matrix")
-        return df
-    except Exception as e:
-        return None
+    # Alag-alag file extensions aur casing check karne ke liye array
+    possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "SBBT_Master_Quotation_Matrix.XLSX", "sbbt_master_quotation_matrix.xlsx"]
+    
+    for file_name in possible_files:
+        if os.path.exists(file_name):
+            try:
+                # Sheet name flexible matching ke liye pehle poori file read karenge
+                xl = pd.ExcelFile(file_name)
+                sheet_target = "AI Master Matrix"
+                if sheet_target not in xl.sheet_names:
+                    sheet_target = xl.sheet_names[0] # Agar naam alag ho toh pehli sheet utha lo
+                
+                df = pd.read_excel(file_name, sheet_name=sheet_target)
+                return df
+            except Exception as e:
+                continue
+    return None
 
 df_matrix = load_sbbt_matrix()
 
@@ -114,20 +127,27 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 total_built_up = plot_area_ft * total_floors
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 6. EXCEL SPECIFICATIONS GENERATION FOR EMBED
+# 6. EXCEL SPECIFICATIONS GENERATION WITH AUTONOMOUS FALLBACK
 excel_specs_html = ""
-if df_matrix is not None:
+if df_matrix is not None and selected_excel_col in df_matrix.columns:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ MATERIAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()} (LIVE FROM EXCEL):</div><ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
     for idx, row in df_matrix.iterrows():
-        category = row['Category / Element']
+        category = row['Category / Element'] if 'Category / Element' in df_matrix.columns else row.iloc[0]
         spec_detail = row[selected_excel_col]
         if pd.notna(spec_detail) and "Excluded" not in str(spec_detail):
             excel_specs_html += f"<li><b>{category}:</b> {spec_detail}</li>"
     excel_specs_html += "</ul>"
 else:
-    excel_specs_html = "<p style='color:#ef4444; font-size:14px;'>ℹ️ Excel File (SBBT_Master_Quotation_Matrix.xlsx) offline hai ya repository me nahi mili.</p>"
+    # FALLBACK ENGINE: Excel na milne par premium defaults automatic load ho jayenge
+    excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ STANDARD TECHNICAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()}:</div>"
+    excel_specs_html += "<ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
+    excel_specs_html += "<li><b>Steel Layout:</b> Rathi TMT Fe500 / Kamdhenu Premium structural bars as per design blueprints.</li>"
+    excel_specs_html += "<li><b>Concrete Grade:</b> RMC M25 / Ready-Mix Structural Foundations and robust roofing.</li>"
+    excel_specs_html += "<li><b>Masonry Work:</b> Eco-friendly high-density AAC Blocks / Classic Grade-A Red Bricks.</li>"
+    excel_specs_html += "<li><b>Plaster Framework:</b> Rich-mix cement mortar plastering with smooth internal finishes.</li>"
+    excel_specs_html += "</ul>"
 
-# 7. GENERATING LIVE BREAKOUT ROWS FOR EMBED
+# 7. GENERATING LIVE BREAKOUT ROWS
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -223,7 +243,7 @@ proposal_html = f"""
 </div>
 """
 
-# 8. RENDER HTML PREVIEW NATIVELY VIA MARKDOWN (FIXES THE DATAFRAME TYPE ERROR)
+# 8. RENDER HTML PREVIEW NATIVELY
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
 st.caption("💡 Tip: Press **Ctrl + P** anywhere on this dashboard to save or print this proposal as a clean official corporate PDF.")
