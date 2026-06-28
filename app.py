@@ -123,7 +123,7 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 total_built_up = plot_area_ft * total_floors
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 6. DYNAMIC EXCEL MATERIAL SPECIFICATIONS FETCHING WITH INTERACTIVE FALLBACKS
+# 6. DYNAMIC MATERIAL SPECIFICATIONS FETCHING WITH INTERACTIVE FALLBACKS
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ MATERIAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()} (LIVE FROM EXCEL):</div><ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
@@ -134,22 +134,27 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
             excel_specs_html += f"<li><b>{category}:</b> {spec_detail}</li>"
     excel_specs_html += "</ul>"
 else:
+    # HARD-LOCKED PACKAGE DYNAMIC SPECIFICATIONS (Prevents duplicate texts across versions)
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX ({selected_global_display.upper()}):</div>"
     excel_specs_html += "<ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
+    
     if "Solid Structure" in selected_global_display:
         excel_specs_html += "<li><b>Scope Definition:</b> Pure Structural Grey Structure Core (Brickwork, RCC, Plastering only).</li>"
         excel_specs_html += "<li><b>Steel Layout:</b> Heavy Duty Rathi Fe500 / Kamdhenu structural reinforcement layout.</li>"
         excel_specs_html += "<li><b>Concrete Grade:</b> Certified M25 Design Mix RMC for columns, beams, and foundations.</li>"
         excel_specs_html += "<li><b>Masonry Work:</b> First-Class high-strength AAC Blocks or traditional Grade-A Red Bricks.</li>"
+        excel_specs_html += "<li><b>Finishing Elements:</b> <span style='color:#ef4444; font-weight:600;'>Excluded (Core Structural Shell Only)</span>.</li>"
     elif "Essential" in selected_global_display:
         excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing Layout.</li>"
         excel_specs_html += "<li><b>Flooring Profiles:</b> Premium Vitrified tiles (2x2 or 4x2) in living areas and anti-skid floor setups.</li>"
         excel_specs_html += "<li><b>Bathrooms Setup:</b> Standard Cera / Jaquar functional CP fittings and wall tiles up to 7ft.</li>"
+        excel_specs_html += "<li><b>Electrical Layout:</b> Fire-retardant Havells/Finolex wiring inside robust PVC conduits.</li>"
     else:
         excel_specs_html += "<li><b>Front Elevation:</b> Dynamic Modern HPL Cladding & ACP Sheet architectural framework.</li>"
         excel_specs_html += "<li><b>Vertical Transit:</b> Premium 4-Passenger Automatic Elevator completely embedded.</li>"
         excel_specs_html += "<li><b>Balconies & Stairs:</b> Heavy SS304 Top-Rail Glass Railing for 5 front layout openings.</li>"
         excel_specs_html += "<li><b>Luxury Bathrooms:</b> Full Jaquar Diverter setups, premium Wall-Hung WCs, and Designer vanity assets.</li>"
+    
     excel_specs_html += "</ul>"
 
 # 7. GENERATING LIVE BREAKOUT ROWS
@@ -165,9 +170,15 @@ for item in floor_data:
     </tr>
     """
 
-# MASTER PROPOSAL HTML CONTAINER
-proposal_html = f"""
-<div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #111827;">
+# 8. MASTER PROPOSAL HTML CONTAINER (With auto-trigger printing wrapper when opened standalone)
+proposal_html = f"""<!DOCTYPE html>
+<html>
+<head>
+<title>SBBT Official Proposal</title>
+<meta charset="utf-8">
+</head>
+<body style="margin:0; padding:10px; background-color:#ffffff;">
+<div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 850px; margin: 0 auto;">
     
     <div style="text-align: center; border-bottom: 3px solid #111827; padding-bottom: 15px;">
         <h2 style="margin: 0; color: #111827; letter-spacing: 1px; font-size: 26px; font-weight: 700;">SHREE BADREE BUILD TECH PVT. LTD.</h2>
@@ -176,12 +187,12 @@ proposal_html = f"""
     </div>
 
     <div style="margin-top: 22px; display: flex; justify-content: space-between; font-size: 14px; line-height: 1.6; color: #374151;">
-        <div style="flex: 1; min-width: 250px;">
+        <div style="width: 50%;">
             <b>Quotation Ref:</b> SBBT/Q/{datetime.date.today().year}/092<br>
             <b>Client Name:</b> {client_name}<br>
             <b>Project Site Location:</b> {project_address}
         </div>
-        <div style="flex: 1; text-align: right; min-width: 250px;">
+        <div style="width: 50%; text-align: right;">
             <b>Date Issued:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
             <b>Plot Size:</b> {plot_area_yd} Sq. Yards ({plot_area_ft} Sq. Ft.)<br>
             <b>Total Built-up Area:</b> {total_built_up:,} Sq. Ft. ({total_floors} Floors)
@@ -197,66 +208,5 @@ proposal_html = f"""
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background-color: #111827; color: #ffffff;">
-                    <th style="padding: 12px; font-size: 14px; border-radius: 4px 0 0 0;">Floor Profile</th>
-                    <th style="padding: 12px; font-size: 14px;">Selected Package</th>
-                    <th style="padding: 12px; font-size: 14px; text-align: center;">Area (Sq.Ft)</th>
-                    <th style="padding: 12px; font-size: 14px; text-align: right; border-radius: 0 4px 0 0;">Subtotal (INR)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {table_rows_html}
-            </tbody>
-        </table>
-    </div>
-
-    <div style="margin-top: 25px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 18px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold; font-size: 15px; color: #1e40af;">TOTAL ESTIMATED CONSTRUCTION COST (GST INCLUDED):</span>
-        <span style="font-size: 24px; font-weight: 700; color: #1e3a8a;">₹ {net_project_cost:,.2f}</span>
-    </div>
-
-    <div style="margin-top: 22px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 15px; font-size: 14px; color: #78350f;">
-        <b>⚙️ STRUCTURAL EXTRA ADVANTAGES & COMMITMENTS:</b><br>
-        <span style="color: #92400e; display: block; margin-top: 5px;">{additional_reqs}</span>
-    </div>
-
-    <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px;">
-        {excel_specs_html}
-    </div>
-
-    <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px; font-size: 13px; color: #4b5563; line-height: 1.6;">
-        <b>🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:</b>
-        <ul style="margin: 6px 0 0 0; padding-left: 20px;">
-            <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.</li>
-            <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.</li>
-            <li><b>Quality Governance:</b> End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.</li>
-        </ul>
-    </div>
-
-    <div style="margin-top: 35px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; font-size: 13px; color: #374151;">
-        <div>
-            <br>
-            <span style="font-size: 12px; color: #6b7280; font-style: italic;">Authorized Signatory</span><br>
-            <b>Shree Badree Build Tech Pvt. Ltd.</b>
-        </div>
-        <div style="text-align: right; line-height: 1.6;">
-            📞 <b>Contact:</b> +91 8800614403, 9625803339<br>
-            📧 <b>Email:</b> deeep1sharma@gmail.com<br>
-            <span style="color: #6b7280; font-size: 12px;">Building Trust Through Quality & Transparency</span>
-        </div>
-    </div>
-
-</div>
-"""
-
-# 8. LIVE INTERFACE PREVIEW & AUTO-PRINT GATEWAY
-st.write("---")
-st.write("### 📈 SBBT Official Commercial Proposal")
-
-# THE EASY solution: Direct print/download trigger button right on dashboard
-st.caption("👇 Neeche click karke direct proposal save ya print kar sakte hain:")
-if st.button("📥 Generate Official PDF", type="primary"):
-    # Triggers automatic browser native print system via script injection
-    st.components.v1.html("<script>window.print();</script>", height=0)
-
-st.write("")
-st.markdown(proposal_html, unsafe_allow_html=True)
+                    <th style="padding: 12px; font-size: 14px;">Floor Profile</th>
+                    <th
