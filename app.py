@@ -4,7 +4,7 @@ import datetime
 # Page Configuration
 st.set_page_config(page_title="SBBT Quotation Generator", page_icon="🏗️", layout="wide")
 
-# Custom CSS for Premium UI & Print Layout
+# SOLUTION: HTML/CSS Static Block standard markdown string mein (f-string hatadi hai)
 st.markdown("""
 <style>
     .report-container {
@@ -61,14 +61,14 @@ st.markdown("""
         margin: 15px 0;
         font-size: 15px;
     }
-    th {
+    .report-container th {
         background-color: #F4F7FA;
         color: #1B365D;
         text-align: left;
         padding: 10px;
         border-bottom: 2px solid #D3D3D3;
     }
-    td {
+    .report-container td {
         padding: 10px;
         border-bottom: 1px solid #EAEAEA;
     }
@@ -83,7 +83,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_safe_html=True)
 
-# 1. SIMPLE LOGIN SYSTEM (Expansion Ready)
+# 1. AUTHENTICATION SYSTEM
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
 
@@ -92,26 +92,25 @@ if not st.session_state['authenticated']:
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username == "sbbt_admin" and password == "sbbt@2026": # Secure passwords in secrets later
+        if username == "sbbt_admin" and password == "sbbt@2026":
             st.session_state['authenticated'] = True
+            st.sidebar.success("Logged In Successfully!")
             st.rerun()
         else:
             st.error("Invalid Credentials")
     st.stop()
 
-# 2. APP SIDEBAR INPUTS (Control Panel)
+# 2. CONTROL PANEL INPUTS
 st.sidebar.header("🛠️ Quotation Configurator")
 
 client_name = st.sidebar.text_input("Client Name", "Rahul Sharma")
 project_address = st.sidebar.text_input("Project Address", "Sector 45, Gurgaon")
 plot_area_yd = st.sidebar.number_input("Plot Area (Sq. Yards)", min_value=10, max_value=1000, value=150)
 built_up_area = st.sidebar.number_input("Total Built-up Area (Sq. Ft.)", min_value=100, max_value=20000, value=3500)
-
 floors_type = st.sidebar.selectbox("Floor Configuration", ["G+1/2", "G+3/4"])
-
 package_type = st.sidebar.selectbox("Select Base Package", ["Core Shell Only", "Essential Package", "Premium Luxury"])
 
-# Customizable Pricing Sliders based on package
+# Price constraints management
 if package_type == "Core Shell Only":
     psf_rate = st.sidebar.slider("Custom Rate (PSF)", 1199, 1248, 1199)
 elif package_type == "Essential Package":
@@ -119,34 +118,29 @@ elif package_type == "Essential Package":
 else:
     psf_rate = st.sidebar.slider("Custom Rate (PSF)", 2099, 2499, 2099)
 
-# Addons Configuration
 st.sidebar.subheader("➕ Optional Addons")
 elevator_floors = st.sidebar.number_input("Elevator Provision (No. of Floors)", min_value=0, max_value=10, value=0)
 elevator_units = st.sidebar.number_input("Full Elevator Installation (4 Pax Units)", min_value=0, max_value=5, value=0)
 
-# Custom Client-Centric Line Generator (Dynamic Text box)
 st.sidebar.subheader("✍️ Client Centric Touch")
 custom_note = st.sidebar.text_area(
     "Custom Dedication Line", 
     f"Dear {client_name}, this bespoke blueprint is engineered to transform your vision at {project_address} into a structural masterpiece, blending uncompromising seismic safety with timeless architectural elegance."
 )
 
-# 3. CALCULATION LOGIC
-# Timeline evaluation
+# 3. METRIC EVALUATIONS
 timeline = "6 Months" if floors_type == "G+1/2" else "9 Months"
+base_cost = built_up_area * psf_rate
+ele_prov_cost = elevator_floors * 30000
+ele_kit_cost = elevator_units * 850000
+net_total = base_cost + ele_prov_cost + ele_kit_cost
 
-# Cost Calculations
-base_construction_cost = built_up_area * psf_rate
-elevator_provision_cost = elevator_floors * 30000
-elevator_kit_cost = elevator_units * 850000
-net_total = base_construction_cost + elevator_provision_cost + elevator_kit_cost
-
-# 4. DESIGNER QUOTATION GENERATOR (HTML OUTPUT)
+# 4. STRUCTURED HTML GENERATION (Safe implementation without bracket mixing)
 st.title("🏗️ SBBT Premium Quotation Engine")
 st.caption("Configure inputs on the left sidebar. Press Ctrl+P to save the styled block as PDF.")
 
-# Styled HTML Block
-quote_html = f"""
+# Header Component
+st.markdown(f"""
 <div class="report-container">
     <table class="header-table">
         <tr>
@@ -163,64 +157,47 @@ quote_html = f"""
             </td>
         </tr>
     </table>
-    
     <hr style="border: 0; border-top: 1px solid #1B365D; margin-bottom: 20px;">
-    
-    <div class="client-line">
-        "{custom_note}"
-    </div>
-    
+    <div class="client-line">"{custom_note}"</div>
     <table style="width:100%; margin-bottom: 20px; font-size: 14px;">
-        <tr>
-            <td><b>Prepared For:</b> {client_name}</td>
-            <td><b>Plot Area:</b> {plot_area_yd} Sq. Yards</td>
-        </tr>
-        <tr>
-            <td><b>Project Site:</b> {project_address}</td>
-            <td><b>Built-up Area:</b> {built_up_area} Sq. Ft.</td>
-        </tr>
-        <tr>
-            <td><b>Project Timeline:</b> {timeline} ({floors_type})</td>
-            <td><b>Selected Tier:</b> {package_type} (@ ₹{psf_rate}/PSF)</td>
-        </tr>
+        <tr><td><b>Prepared For:</b> {client_name}</td><td><b>Plot Area:</b> {plot_area_yd} Sq. Yards</td></tr>
+        <tr><td><b>Project Site:</b> {project_address}</td><td><b>Built-up Area:</b> {built_up_area} Sq. Ft.</td></tr>
+        <tr><td><b>Project Timeline:</b> {timeline} ({floors_type})</td><td><b>Selected Tier:</b> {package_type} (@ ₹{psf_rate}/PSF)</td></tr>
     </table>
-    
     <div class="section-title">PROJECT COST ESTIMATE & COMPONENT BREAKDOWN</div>
     <table style="width:100%; border-collapse: collapse;">
         <thead>
-            <tr>
-                <th>Scope Description</th>
-                <th style="text-align: right;">Rate / Metrics</th>
-                <th style="text-align: right;">Amount (INR)</th>
-            </tr>
+            <tr><th>Scope Description</th><th style="text-align: right;">Rate / Metrics</th><th style="text-align: right;">Amount (INR)</th></tr>
         </thead>
         <tbody>
             <tr>
                 <td><b>Base Structural & Finishing Work</b><br><small>As per {package_type} specifications</small></td>
                 <td style="text-align: right;">₹{psf_rate} / Sq.Ft.</td>
-                <td style="text-align: right;">₹ {base_construction_cost:,.2f}</td>
+                <td style="text-align: right;">₹ {base_cost:,.2f}</td>
             </tr>
-"""
+""", unsafe_allow_safe_html=True)
 
+# Conditional Components
 if elevator_floors > 0:
-    quote_html += f"""
+    st.markdown(f"""
             <tr>
                 <td><b>Elevator Shaft Provision</b><br><small>Civil & structural alignment</small></td>
                 <td style="text-align: right;">{elevator_floors} Floors @ ₹30,000</td>
-                <td style="text-align: right;">₹ {elevator_provision_cost:,.2f}</td>
+                <td style="text-align: right;">₹ {ele_prov_cost:,.2f}</td>
             </tr>
-    """
+    """, unsafe_allow_safe_html=True)
 
 if elevator_units > 0:
-    quote_html += f"""
+    st.markdown(f"""
             <tr>
                 <td><b>Full Elevator Kit & Installation</b><br><small>4 Passenger premium setup</small></td>
                 <td style="text-align: right;">{elevator_units} Unit(s) @ ₹8,50,000</td>
-                <td style="text-align: right;">₹ {elevator_kit_cost:,.2f}</td>
+                <td style="text-align: right;">₹ {ele_kit_cost:,.2f}</td>
             </tr>
-    """
+    """, unsafe_allow_safe_html=True)
 
-quote_html += f"""
+# Total Footer & Inclusions
+st.markdown(f"""
             <tr class="total-row">
                 <td>Estimated Net Total (Excluding GST)</td>
                 <td></td>
@@ -228,49 +205,42 @@ quote_html += f"""
             </tr>
         </tbody>
     </table>
-    
     <div class="section-title">PACKAGE SPECIFICATIONS & INCLUSIONS</div>
     <div style="font-size: 13px; line-height: 1.6; color: #444444; padding: 10px;">
-"""
+""", unsafe_allow_safe_html=True)
 
-# Dynamic Inclusions/Exclusions Based on Selected Package
 if package_type == "Core Shell Only":
-    quote_html += """
+    st.markdown("""
         <ul>
-            <li><b>Structure:</b> Complete RCC framework as per structural designs (M25 Ready-Mix Concrete).</li>
-            <li><b>Steel & Masonry:</b> Rathi TMT Steel (or equivalent) with Premium AAC Blocks / Red Bricks.</li>
-            <li><b>Electricals:</b> Concealed PVC Conduits laid in slabs & walls only (No wiring or switches included).</li>
-            <li><span style="color:red;"><b>Major Exclusions:</b></span> Electrical wires, switches, plumbing lines, flooring, painting, doors, windows, and modular woodwork.</li>
+            <li><b>Structure:</b> Complete RCC framework as per structural drawings: Foundation, Columns, Beams, and Slabs using RMC M25 Concrete.</li>
+            <li><b>Steel & Masonry:</b> Premium Rathi TMT Steel (or equivalent) with high-strength AAC Blocks or Red Bricks.</li>
+            <li><b>Electricals:</b> Concealed PVC conduits laid inside slabs & walls only (Conduit only - no wiring, no switches).</li>
+            <li><span style="color:red;"><b>Major Exclusions:</b></span> Finishing items, wiring, plumbing lines, flooring, and woodwork are excluded.</li>
         </ul>
-    """
+    """, unsafe_allow_safe_html=True)
 elif package_type == "Essential Package":
-    quote_html += """
+    st.markdown("""
         <ul>
-            <li><b>Plumbing & Tanks:</b> Astral/Prince CPVC & SWR pipes, basic Hindware/Jaquar sanitary setups, and 500L/1000L Sintex water tank per 1000 sq ft area.</li>
-            <li><b>Electricals:</b> Havells / Polycab / Plaza / RR FRLS wire with basic modular switches & MCBs.</li>
-            <li><b>Ceiling & Finish:</b> 1 Designer False Ceiling in Drawing Room only; Basic POP Cornice designs in other areas.</li>
-            <li><b>Flooring & Stones:</b> Somany 2'x2' vitrified tiles (Budget upto ₹40/sq.ft.) and P. White Granite layout in parking zones.</li>
+            <li><b>Plumbing & Tanks:</b> Astral/Prince CPVC & SWR pipeline layout with standard Hindware/Jaquar basic CP fittings & English WC.</li>
+            <li><b>Electricals:</b> Certified Havells / Polycab / Plaza / RR FRLS wire installations with standard modular switches & distribution board MCBs.</li>
+            <li><b>Flooring & Accents:</b> Premium P. White Granite layout in parking, Black Granite stairs, and Somany 2'x2' vitrified floor tiles.</li>
+            <li><b>Ceiling & Paint:</b> 1 Designer False Ceiling in Drawing Room only; Basic POP Cornice molding in all other rooms.</li>
         </ul>
-    """
+    """, unsafe_allow_safe_html=True)
 else:
-    quote_html += """
+    st.markdown("""
         <ul>
-            <li><b>Premium Structural Setup:</b> Heavy-duty framework utilizing premium <b>Jindal / Tata TMT bars</b>.</li>
-            <li><b>Luxury Plumbing:</b> Wall-Hung Jaquar (or similar) fixtures, integrated Diverter Lines, and high-efficiency Output Pressure Motors with 1000L Sintex tanks.</li>
-            <li><b>Full Interior Woodwork:</b> Standard Modular Kitchen (8'x5') + Wardrobes (4'x9') in every bedroom featuring branded boards/fittings with a <b>5-Year Company Warranty</b>.</li>
-            <li><b>Premium Finishes:</b> Designer False Ceiling in every room, premium 2'x4' Somany/Johnson/Nitco tiles, Anti-skid roof tiles, and SS304 main gates/staircase glass railings.</li>
-            <li><b>Smart Tech:</b> Integrated 6-Channel CCTV surveillance network and Smart Electronic Digital Gate Lock.</li>
+            <li><b>Structure & Steel:</b> Premium structural layout upgrading options up to heavy Tata/Jindal TMT bar distributions.</li>
+            <li><b>Luxury Fittings:</b> Wall-Hung Jaquar setups, dedicated Diverter lines, output pressure motor distribution, and 1000L Sintex tanks per 1000 sq.ft.</li>
+            <li><b>Modular Woodwork:</b> Complete Standard Modular Kitchen (8'x5') and high-grade board wardrobes (4'x9') in every bedroom with a 5-Year Company Warranty.</li>
+            <li><b>Ceiling & Tech:</b> Full Designer Gypsum/POP False Ceiling in every single room, 6-Channel CCTV setup, and Smart Digital Gate Lock for advanced safety.</li>
         </ul>
-    """
+    """, unsafe_allow_safe_html=True)
 
-quote_html += """
+st.markdown("""
     </div>
-    
     <div style="margin-top: 30px; font-size: 11px; color: #777777; text-align: center;">
         Building Trust Through Quality & Transparency • Shree Badree Build Tech Pvt Ltd
     </div>
 </div>
-"""
-
-# Render HTML in Streamlit
-st.markdown(quote_html, unsafe_allow_safe_html=True)
+""", unsafe_allow_safe_html=True)
