@@ -9,18 +9,14 @@ st.set_page_config(page_title="SBBT Premium Quotation Engine", page_icon="🏗�
 # 2. AUTOMATIC & FLEXIBLE EXCEL SHEET READER
 @st.cache_data
 def load_sbbt_matrix():
-    # Alag-alag file extensions aur casing check karne ke liye array
     possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "SBBT_Master_Quotation_Matrix.XLSX", "sbbt_master_quotation_matrix.xlsx"]
-    
     for file_name in possible_files:
         if os.path.exists(file_name):
             try:
-                # Sheet name flexible matching ke liye pehle poori file read karenge
                 xl = pd.ExcelFile(file_name)
                 sheet_target = "AI Master Matrix"
                 if sheet_target not in xl.sheet_names:
-                    sheet_target = xl.sheet_names[0] # Agar naam alag ho toh pehli sheet utha lo
-                
+                    sheet_target = xl.sheet_names[0]
                 df = pd.read_excel(file_name, sheet_name=sheet_target)
                 return df
             except Exception as e:
@@ -38,7 +34,7 @@ if not st.session_state['authenticated']:
     st.write("Shree Badree Build Tech Pvt. Ltd. — Administrative Login")
     
     with st.form("Access Portal"):
-        username = st.text_input("Username")
+        username = st.text_input("Username", "sbbt_admin")
         password = st.text_input("Password", type="password")
         login_submitted = st.form_submit_button("Authenticate Entry")
         
@@ -127,7 +123,7 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 total_built_up = plot_area_ft * total_floors
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 6. EXCEL SPECIFICATIONS GENERATION WITH AUTONOMOUS FALLBACK
+# 6. DYNAMIC EXCEL MATERIAL SPECIFICATIONS FETCHING WITH INTERACTIVE FALLBACKS
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ MATERIAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()} (LIVE FROM EXCEL):</div><ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
@@ -138,13 +134,34 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
             excel_specs_html += f"<li><b>{category}:</b> {spec_detail}</li>"
     excel_specs_html += "</ul>"
 else:
-    # FALLBACK ENGINE: Excel na milne par premium defaults automatic load ho jayenge
-    excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ STANDARD TECHNICAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()}:</div>"
+    # PACKAGE-WISE CONDITIONAL FALLBACK ENGINES (Locks unique values per dropdown selection)
+    excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX ({selected_global_display.upper()}):</div>"
     excel_specs_html += "<ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
-    excel_specs_html += "<li><b>Steel Layout:</b> Rathi TMT Fe500 / Kamdhenu Premium structural bars as per design blueprints.</li>"
-    excel_specs_html += "<li><b>Concrete Grade:</b> RMC M25 / Ready-Mix Structural Foundations and robust roofing.</li>"
-    excel_specs_html += "<li><b>Masonry Work:</b> Eco-friendly high-density AAC Blocks / Classic Grade-A Red Bricks.</li>"
-    excel_specs_html += "<li><b>Plaster Framework:</b> Rich-mix cement mortar plastering with smooth internal finishes.</li>"
+    
+    if "Solid Structure" in selected_global_display:
+        excel_specs_html += "<li><b>Scope Definition:</b> Pure Structural Grey Structure Core (Brickwork, RCC, Plastering only)[cite: 118, 142].</li>"
+        excel_specs_html += "<li><b>Steel Layout:</b> Heavy Duty Rathi Fe500 / Kamdhenu structural reinforcement layout[cite: 144].</li>"
+        excel_specs_html += "<li><b>Concrete Grade:</b> Certified M25 Design Mix RMC for columns, beams, and foundations[cite: 143, 145].</li>"
+        excel_specs_html += "<li><b>Masonry Work:</b> First-Class high-strength AAC Blocks or traditional Grade-A Red Bricks[cite: 146].</li>"
+        excel_specs_html += "<li><b>Finishes Included:</b> Dual-layer external plastering and rich internal backing plaster.</li>"
+        excel_specs_html += "<li><b>Finishing Elements:</b> <span style='color:#ef4444; font-weight:600;'>Excluded (Core Structural Shell Only)</span>.</li>"
+        
+    elif "Essential" in selected_global_display:
+        excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing Layout.</li>"
+        excel_specs_html += "<li><b>Steel & Concrete:</b> Standard Fe500 TMT Steel alongside M20/M25 foundation layouts.</li>"
+        excel_specs_html += "<li><b>Flooring Profiles:</b> Premium Vitrified tiles (2x2 or 4x2) in living areas and anti-skid floor setups.</li>"
+        excel_specs_html += "<li><b>Bathrooms Setup:</b> Standard Cera / Jaquar functional CP fittings and wall tiles up to 7ft.</li>"
+        excel_specs_html += "<li><b>Electrical Layout:</b> Fire-retardant Havells/Finolex wiring inside robust PVC conduits.</li>"
+        excel_specs_html += "<li><b>Interior Paints:</b> Smooth wall putty layers finished with premium Asian Paints Acrylic Emulsion.</li>"
+        
+    else: # Premium Luxury Profile
+        excel_specs_html += "<li><b>Front Elevation:</b> Dynamic Modern HPL Cladding & ACP Sheet architectural framework[cite: 131, 153, 154].</li>"
+        excel_specs_html += "<li><b>Vertical Transit:</b> Premium 4-Passenger Automatic Elevator completely embedded[cite: 131].</li>"
+        excel_specs_html += "<li><b>Balconies & Stairs:</b> Heavy SS304 Top-Rail Glass Railing for 5 front layout openings[cite: 131, 161, 162].</li>"
+        excel_specs_html += "<li><b>Luxury Bathrooms:</b> Full Jaquar Diverter setups, premium Wall-Hung WCs, and Designer vanity assets[cite: 131, 148, 149, 150].</li>"
+        excel_specs_html += "<li><b>Smart Automations:</b> Integrated Video Door Phone, Multi-channel CCTV, and Digital main gate locks[cite: 134, 165, 166, 167].</li>"
+        excel_specs_html += "<li><b>Interior Ceiling:</b> Designer Ambient False Ceiling with strategic LED layouts across all floors[cite: 136, 137].</li>"
+    
     excel_specs_html += "</ul>"
 
 # 7. GENERATING LIVE BREAKOUT ROWS
@@ -221,8 +238,8 @@ proposal_html = f"""
     <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px; font-size: 13px; color: #4b5563; line-height: 1.6;">
         <b>🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:</b>
         <ul style="margin: 6px 0 0 0; padding-left: 20px;">
-            <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.</li>
-            <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.</li>
+            <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout[cite: 143, 144, 145].</li>
+            <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster[cite: 146].</li>
             <li><b>Quality Governance:</b> End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.</li>
         </ul>
     </div>
@@ -243,7 +260,7 @@ proposal_html = f"""
 </div>
 """
 
-# 8. RENDER HTML PREVIEW NATIVELY
+# 8. RENDER PREVIEW NATIVELY VIA STREAMLIT MARKDOWN
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
 st.caption("💡 Tip: Press **Ctrl + P** anywhere on this dashboard to save or print this proposal as a clean official corporate PDF.")
