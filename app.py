@@ -56,7 +56,7 @@ c_col1, c_col2 = st.columns(2)
 with c_col1:
     client_name = st.text_input("Client Name", "Mr. & Mrs. Sharma")
     project_address = st.text_input("Site Location/Address", "Palam, Gurgaon (HR)")
-    # Global package selection for all floors
+    # GLOBAL SELECTION: pure project ke liye ek hi master package selection
     selected_global_display = st.selectbox("Select Project Master Package", list(package_options.keys()), index=2)
     selected_excel_col = package_options[selected_global_display]
 
@@ -99,10 +99,10 @@ for i in range(total_floors):
     f_rate = st.number_input(f"Custom Rate for {floor_label} (₹/PSF)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_{i}")
     
     floor_data.append({
-        "Floor Profile": floor_label, 
-        "Package Profile": selected_global_display, 
-        "Area (Sq.Ft)": plot_area_ft, 
-        "Rate (₹/PSF)": f_rate
+        "floor": floor_label, 
+        "package": selected_global_display, 
+        "area": plot_area_ft, 
+        "rate": f_rate
     })
 
 st.write("---")
@@ -117,12 +117,7 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 
 # 5. MATHEMATICAL COMPUTATION
 total_built_up = plot_area_ft * total_floors
-net_project_cost = sum(item['Area (Sq.Ft)'] * item['Rate (₹/PSF)'] for item in floor_data)
-
-# Convert data to clean DataFrame for breakout view
-df_display = pd.DataFrame(floor_data)
-df_display["Subtotal Amount (INR)"] = df_display["Area (Sq.Ft)"] * df_display["Rate (₹/PSF)"]
-df_display["Subtotal Amount (INR)"] = df_display["Subtotal Amount (INR)"].map("₹ {:,.2f}".format)
+net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
 # 6. ELEGANT EXECUTIVE PROPOSAL DISPLAY
 st.write("---")
@@ -154,9 +149,26 @@ with st.container(border=True):
     st.write("")
     
     st.write("**📋 DETAILED ARCHITECTURAL COST BREAKOUT:**")
-    st.dataframe(df_display, hide_index=True, use_container_width=True)
+    st.write("")
+    
+    # Render layout tables natively using strict column mapping (Forces instant refresh)
+    th1, th2, th3, th4 = st.columns([2, 3, 2, 3])
+    with th1: st.write("**Floor**")
+    with th2: st.write("**Selected Scope**")
+    with th3: st.write("**Metrics**")
+    with th4: st.write("**Subtotal (INR)**")
+    st.write("---")
+    
+    for item in floor_data:
+        subtotal = item['area'] * item['rate']
+        r1, r2, r3, r4 = st.columns([2, 3, 2, 3])
+        with r1: st.write(item['floor'])
+        with r2: st.write(item['package'])
+        with r3: st.write(f"{item['area']:,} Sq.Ft")
+        with r4: st.write(f"₹ {subtotal:,.2f} (@ ₹{item['rate']}/PSF)")
         
     st.write("")
+    st.write("---")
     st.metric(label="TOTAL ESTIMATED CONSTRUCTION COST (Excl. GST)", value=f"₹ {net_project_cost:,.2f}")
     st.write("---")
     
