@@ -123,7 +123,7 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 total_built_up = plot_area_ft * total_floors
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 6. DYNAMIC MATERIAL SPECIFICATIONS FETCHING WITH INTERACTIVE FALLBACKS
+# 6. DYNAMIC SPECIFICATIONS ENGINE
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ MATERIAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()} (LIVE FROM EXCEL):</div><ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
@@ -134,7 +134,6 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
             excel_specs_html += f"<li><b>{category}:</b> {spec_detail}</li>"
     excel_specs_html += "</ul>"
 else:
-    # HARD-LOCKED PACKAGE DYNAMIC SPECIFICATIONS (Prevents duplicate texts across versions)
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX ({selected_global_display.upper()}):</div>"
     excel_specs_html += "<ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
     
@@ -170,15 +169,9 @@ for item in floor_data:
     </tr>
     """
 
-# 8. MASTER PROPOSAL HTML CONTAINER (With auto-trigger printing wrapper when opened standalone)
-proposal_html = f"""<!DOCTYPE html>
-<html>
-<head>
-<title>SBBT Official Proposal</title>
-<meta charset="utf-8">
-</head>
-<body style="margin:0; padding:10px; background-color:#ffffff;">
-<div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 850px; margin: 0 auto;">
+# 8. MASTER PROPOSAL HTML GENERATION
+proposal_html = f"""
+<div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 850px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
     
     <div style="text-align: center; border-bottom: 3px solid #111827; padding-bottom: 15px;">
         <h2 style="margin: 0; color: #111827; letter-spacing: 1px; font-size: 26px; font-weight: 700;">SHREE BADREE BUILD TECH PVT. LTD.</h2>
@@ -209,4 +202,83 @@ proposal_html = f"""<!DOCTYPE html>
             <thead>
                 <tr style="background-color: #111827; color: #ffffff;">
                     <th style="padding: 12px; font-size: 14px;">Floor Profile</th>
-                    <th
+                    <th style="padding: 12px; font-size: 14px;">Selected Package</th>
+                    <th style="padding: 12px; font-size: 14px; text-align: center;">Area (Sq.Ft)</th>
+                    <th style="padding: 12px; font-size: 14px; text-align: right;">Subtotal (INR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {table_rows_html}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 25px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: bold; font-size: 15px; color: #1e40af;">TOTAL ESTIMATED CONSTRUCTION COST (GST INCLUDED):</span>
+        <span style="font-size: 24px; font-weight: 700; color: #1e3a8a;">₹ {net_project_cost:,.2f}</span>
+    </div>
+
+    <div style="margin-top: 22px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 15px; font-size: 14px; color: #78350f;">
+        <b>⚙️ STRUCTURAL EXTRA ADVANTAGES & COMMITMENTS:</b><br>
+        <span style="color: #92400e; display: block; margin-top: 5px;">{additional_reqs}</span>
+    </div>
+
+    <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px;">
+        {excel_specs_html}
+    </div>
+
+    <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px; font-size: 13px; color: #4b5563; line-height: 1.6;">
+        <b>🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:</b>
+        <ul style="margin: 6px 0 0 0; padding-left: 20px;">
+            <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.</li>
+            <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.</li>
+            <li><b>Quality Governance:</b> End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.</li>
+        </ul>
+    </div>
+
+    <div style="margin-top: 35px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; font-size: 13px; color: #374151;">
+        <div>
+            <br>
+            <span style="font-size: 12px; color: #6b7280; font-style: italic;">Authorized Signatory</span><br>
+            <b>Shree Badree Build Tech Pvt. Ltd.</b>
+        </div>
+        <div style="text-align: right; line-height: 1.6;">
+            📞 <b>Contact:</b> +91 8800614403, 9625803339<br>
+            📧 <b>Email:</b> deeep1sharma@gmail.com<br>
+            <span style="color: #6b7280; font-size: 12px;">Building Trust Through Quality & Transparency</span>
+        </div>
+    </div>
+
+</div>
+"""
+
+# HTML Template Wrapper with Print Auto-Trigger for standalone download
+full_downloadable_html = f"""<!DOCTYPE html>
+<html>
+<head>
+<title>SBBT_Official_Proposal</title>
+<meta charset="utf-8">
+</head>
+<body style="margin:0; padding:20px; background-color:#ffffff;">
+{proposal_html}
+<script>window.onload = function() { window.print(); }</script>
+</body>
+</html>"""
+
+# 9. LIVE DASHBOARD INTERFACE
+st.write("---")
+st.write("### 📈 SBBT Official Commercial Proposal")
+st.caption("👇 Neeche click karke designer copy download karein. File open karte hi automatic print/PDF option khul jayega:")
+
+# Safe Download Trigger
+st.download_button(
+    label="📥 Download Designer Proposal",
+    data=full_downloadable_html,
+    file_name="SBBT_Official_Proposal.html",
+    mime="text/html",
+    type="primary"
+)
+
+st.write("")
+# Safely displays the luxury design right inside Streamlit dashboard
+st.markdown(proposal_html, unsafe_allow_html=True)
