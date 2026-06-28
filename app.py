@@ -1,10 +1,11 @@
 import streamlit as st
+import pandas as pd
 import datetime
 
 # 1. PAGE LAYOUT CONFIGURATION
 st.set_page_config(page_title="SBBT Premium Quotation Engine", page_icon="🏗️", layout="centered")
 
-# 2. ADMIN GATEWAY SYSTEM (Zero HTML Dependency)
+# 2. ADMIN GATEWAY SYSTEM
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
 
@@ -38,38 +39,54 @@ with c_col1:
     project_address = st.text_input("Site Location/Address", "Palam, Gurgaon (HR)")
 with c_col2:
     plot_area_yd = st.number_input("Plot Area (Sq. Yards)", min_value=10, max_value=2000, value=150)
-    total_floors = st.slider("Number of Floors to Build", min_value=1, max_value=6, value=3)
+    total_floors = st.slider("Number of Floors to Build (including Stilt/Ground)", min_value=1, max_value=6, value=3)
+
+# AUTOMATIC CORE CALCULATION (1 Sq.Yard = 9 Sq.Feet)
+plot_area_ft = plot_area_yd * 9
 
 st.write("---")
 
 # Section 2: Floor-Wise Detail Matrix Configuration
 st.subheader("📐 Architectural Floor Breakout & Rates")
+st.caption(f"Note: Based on your Plot Area, each floor is automatically set to **{plot_area_ft} Sq.Ft.**")
 
 floor_data = []
-default_packages = ["Solid Structure Core", "Essential Finishing", "Premium Luxury Profile"]
+default_packages = ["Solid Structure Core (₹1199)", "Essential Finishing (₹1699)", "Premium Luxury Profile (₹2099)"]
 
-# Generating inputs dynamically for each floor
+# Generating inputs dynamically for each floor using the master Plot Area
 for i in range(total_floors):
-    floor_label = f"Ground Floor" if i == 0 else f"First Floor" if i == 1 else f"Second Floor" if i == 2 else f"Third Floor" if i == 3 else f"Floor {i}"
-    
-    st.write(f"**🏗️ Configuration for {floor_label}**")
-    f_col1, f_col2, f_col3 = st.columns(3)
+    if i == 0:
+        floor_label = "Ground Floor / Stilt"
+    elif i == 1:
+        floor_label = "First Floor"
+    elif i == 2:
+        floor_label = "Second Floor"
+    elif i == 3:
+        floor_label = "Third Floor"
+    else:
+        floor_label = f"{i}th Floor"
+        
+    st.write(f"**🏗️ Rate Settings for {floor_label}**")
+    f_col1, f_col2 = st.columns(2)
     
     with f_col1:
-        f_area = f_area = st.number_input(f"Area (Sq.Ft)", min_value=50, max_value=5000, value=1800, key=f"area_{i}")
-    with f_col2:
         f_pack = st.selectbox(f"Package Profile", default_packages, index=2, key=f"pack_{i}")
-    with f_col3:
-        if f_pack == "Solid Structure Core":
+    with f_col2:
+        if "Solid Structure" in f_pack:
             min_p, max_p, def_p = 1100, 1500, 1199
-        elif f_pack == "Essential Finishing":
+        elif "Essential" in f_pack:
             min_p, max_p, def_p = 1500, 2000, 1699
         else:
             min_p, max_p, def_p = 2000, 3000, 2399
             
         f_rate = st.number_input(f"Custom Rate (₹/PSF)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_{i}")
     
-    floor_data.append({"floor": floor_label, "area": f_area, "package": f_pack, "rate": f_rate})
+    floor_data.append({
+        "Floor Profile": floor_label, 
+        "Package Profile": f_pack.split(" (")[0], 
+        "Area (Sq.Ft)": plot_area_ft, 
+        "Rate (₹/PSF)": f_rate
+    })
 
 st.write("---")
 
@@ -82,10 +99,15 @@ custom_note = st.text_area(
 additional_reqs = st.text_area("Additional Requirements / Custom Structural Commitments", "Includes 15+ luxury upgrades, earthquake resistant RCC frame configuration, and a comprehensive 2-Year AMC covering operational support.")
 
 # 4. MATHEMATICAL COMPUTATION
-total_built_up = sum(item['area'] for item in floor_data)
-net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
+total_built_up = plot_area_ft * total_floors
+net_project_cost = sum(item['Area (Sq.Ft)'] * item['Rate (₹/PSF)'] for item in floor_data)
 
-# 5. ELEGANT EXECUTIVE PROPOSAL DISPLAY (100% Native Containers)
+# Convert data to clean DataFrame for elegant display
+df_breakout = pd.DataFrame(floor_data)
+df_breakout["Subtotal Amount (INR)"] = df_breakout["Area (Sq.Ft)"] * df_breakout["Rate (₹/PSF)"]
+df_breakout["Subtotal Amount (INR)"] = df_breakout["Subtotal Amount (INR)"].map("₹ {:,.2f}".format)
+
+# 5. ELEGANT EXECUTIVE PROPOSAL DISPLAY (100% Crash-Proof Native)
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
 st.caption("💡 Tip: Click on the preview block below and press **Ctrl + P** to save or print this proposal cleanly.")
@@ -105,8 +127,8 @@ with st.container(border=True):
         st.write(f"**Project Site Location:** {project_address}")
     with m2:
         st.write(f"**Date Issued:** {datetime.date.today().strftime('%d %B %Y')}")
-        st.write(f"**Plot Dimensions:** {plot_area_yd} Sq. Yards")
-        st.write(f"**Total Built-up Area:** {total_built_up:,} Sq. Ft.")
+        st.write(f"**Plot Size:** {plot_area_yd} Sq. Yards ({plot_area_ft} Sq. Ft.)")
+        st.write(f"**Total Built-up Area:** {total_built_up:,} Sq. Ft. ({total_floors} Floors)")
         
     st.write("---")
     
@@ -114,16 +136,9 @@ with st.container(border=True):
     st.info(f"\"{custom_note}\"")
     st.write("")
     
-    st.write("**📋 ITEMIZED ARCHITECTURAL COST BREAKDOWN:**")
-    st.write("")
-    
-    # Rendering Floor Items using dynamic layouts without raw HTML tables
-    for item in floor_data:
-        f_cost = item['area'] * item['rate']
-        st.write(f"**{item['floor']}** — *{item['package']}*")
-        st.write(f"↳ Metrics: {item['area']:,} Sq.Ft. @ ₹{item['rate']:,}/PSF")
-        st.write(f"**Subtotal Amount:** ₹ {f_cost:,.2f}")
-        st.write("-" * 30)
+    st.write("**📋 DETAILED ARCHITECTURAL COST BREAKOUT:**")
+    # Rendering clean structured table using native safe dataframe component
+    st.dataframe(df_breakout, hide_index=True, use_container_width=True)
         
     st.write("")
     # Premium Big Text display using standard Streamlit Metric layout
@@ -136,9 +151,9 @@ with st.container(border=True):
     
     st.write("**🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:**")
     st.markdown("""
-    * **Heavy Duty Structural Core:** Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout[cite: 293, 295, 297, 306].
-    * **High-Grade Masonry:** Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster[cite: 298, 299].
-    * **Quality Governance:** End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking[cite: 324, 325, 326].
+    * **Heavy Duty Structural Core:** Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.
+    * **High-Grade Masonry:** Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.
+    * **Quality Governance:** End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.
     """)
     
     st.write("---")
