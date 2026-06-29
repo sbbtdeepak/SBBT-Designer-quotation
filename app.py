@@ -8,6 +8,10 @@ st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗�
 
 # IMAGE CONFIGURATION HELPER
 def get_image_source(file_name, fallback_url):
+    """
+    Agar 'images' folder mein local file milti hai toh use static asset ki tarah lift karega,
+    nahi toh fallback cloud URL chalega.
+    """
     local_path = os.path.join("images", file_name)
     if os.path.exists(local_path):
         return local_path
@@ -96,9 +100,9 @@ for i in range(total_floors):
         if "Solid Structure" in selected_global_display:
             min_p, max_p, def_p = 1100, 1500, 1199
         elif "Essential" in selected_global_display:
-            min_p, max_p, def_p = 1500, 2000, 1699
+            min_p, max_p, def_p = 1500, 2000, 1659
         else:
-            min_p, max_p, def_p = 2000, 3000, 2399
+            min_p, max_p, def_p = 2000, 3000, 2400
         f_rate = st.number_input(f"Rate (Rs/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
         
     floor_data.append({"floor": floor_label, "area": f_area, "layout": f_layout, "rate": f_rate})
@@ -106,12 +110,12 @@ for i in range(total_floors):
 
 st.write("---")
 custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
-additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized upgrades, earthquake resistant RCC frame configuration, and a comprehensive 2-Year AMC covering operational support.")
+additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
 
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (AS PER PACKAGES DEFINED BY USER)
+# 5. DYNAMIC NEW IMAGE DESIGN SECTION (Categorized exactly as per your specification)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -121,34 +125,35 @@ if "Solid Structure" in selected_global_display:
     ]
 elif "Essential" in selected_global_display:
     img_data = [
-        {"title": "MS Main Gate", "file": "ms_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
-        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "MS Main Gate", "file": "ms_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
+        {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"},
         {"title": "Designer POP Cornice", "file": "pop_cornice.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
         {"title": "Basic English WC", "file": "basic_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Basic Fitting (Taps)", "file": "basic_taps.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
-        {"title": "Basic Kitchen Granite", "file": "kitchen_granite.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"}
+        {"title": "Basic Fitting Taps", "file": "basic_taps.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
+        {"title": "Basic Granite Slab", "file": "granite_slab.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"}
     ]
-else: # Premium Luxury Profile
+else: # Premium Luxury
     img_data = [
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Wardrobe", "file": "wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
+        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
         {"title": "Glass Railing", "file": "glass_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
         {"title": "Wall Hung WC", "file": "wall_hung_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Diverter Fitting", "file": "diverter.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
+        {"title": "Premium Diverter", "file": "diverter.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
         {"title": "False Ceiling", "file": "false_ceiling.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
         {"title": "SS Main Gate", "file": "ss_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "SS Staircase Railing", "file": "ss_staircase_railing.jpg", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
-        {"title": "CCTV Security System", "file": "cctv.jpg", "url": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=150&h=150&fit=crop"}
+        {"title": "SS Staircase Railing", "file": "ss_staircase_railing.jpg", "url": "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?w=150&h=150&fit=crop"},
+        {"title": "Live CCTV System", "file": "cctv_system.jpg", "url": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=150&h=150&fit=crop"}
     ]
 
+# Render Image Section with clear beautiful flex grids
 for img in img_data:
     resolved_src = get_image_source(img['file'], img['url'])
     images_html += f"""
-    <div style="text-align: center; width: 110px;">
-        <img src="{resolved_src}" style="width: 85px; height: 85px; border-radius: 12px; object-fit: cover; border: 2px solid #2563eb;" alt="{img['title']}">
-        <div style="font-size: 11px; font-weight: 600; margin-top: 6px; color: #374151;">{img['title']}</div>
+    <div style="text-align: center; width: 130px; margin: 5px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; background-color: #fafafa;">
+        <img src="{resolved_src}" style="width: 110px; height: 95px; border-radius: 6px; object-fit: cover; border: 1px solid #d1d5db;" alt="{img['title']}">
+        <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #1f2937; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
 # 6. BRANDS ECOSYSTEM
@@ -167,11 +172,11 @@ else:
     if "Solid Structure" in selected_global_display:
         excel_specs_html += "<li><b>Scope Definition:</b> Pure Structural Grey Structure Core Layout.</li><li><b>Concrete Grade:</b> Certified M25 Design Mix RMC Structure.</li>"
     elif "Essential" in selected_global_display:
-        excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing.</li><li><b>Flooring:</b> Premium Vitrified Tiles (600x600 mm).</li>"
+        excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing.</li>"
     else:
-        excel_specs_html += "<li><b>Front Elevation:</b> Dynamic Modern HPL Cladding & ACP Sheet Framework.</li><li><b>Vertical Transit:</b> Premium 4-Passenger Automatic Elevator.</li><li><b>Finishing:</b> Heavy SS304 Top-Rail Glass Railing layout.</li>"
+        excel_specs_html += "<li><b>Front Elevation:</b> Modern Design Elevation Framework with dynamic lighting controls.</li>"
 
-# 8. TABLE DATA ROWS WITH NEW LAYOUT COLUMN
+# 8. TABLE DATA ROWS
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -203,9 +208,10 @@ proposal_html = f"""
 
     <div style="margin-top: 20px; display: flex; justify-content: space-between; font-size: 13px; color: #374151; line-height: 1.5;">
         <div>
-            <b>Quotation Ref:</b> SBBT/Q/2026/092<br>
+            <b>Quotation Ref:</b> SBBT/Q/2026/095<br>
             <b>Client Name:</b> {client_name}<br>
-            <b>Project Location:</b> {project_address}
+            <b>Project Location:</b> {project_address}<br>
+            <b>Quotation Type:</b> <span style="color:#2563eb; font-weight:700;">{selected_global_display}</span>
         </div>
         <div style="text-align: right;">
             <b>Date Issued:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
@@ -219,8 +225,8 @@ proposal_html = f"""
     </div>
 
     <div style="margin-top: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background-color: #ffffff;">
-        <div style="font-weight: 700; font-size: 12px; color: #111827; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase;">📸 Finishes & Execution Scope Visualizations:</div>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <div style="font-weight: 700; font-size: 12px; color: #111827; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 6px;">📸 Visual Scope Material Inclusion Details ({selected_global_display}):</div>
+        <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
             {images_html}
         </div>
     </div>
@@ -249,17 +255,18 @@ proposal_html = f"""
     </div>
 
     <div style="margin-top: 20px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: 700; font-size: 13px; color: #1e40af; letter-spacing: 0.3px;">TOTAL ESTIMATED CONSTRUCTION INVESTMENT (GST INCLUDED):</span>
-        <span style="font-size: 20px; font-weight: 800; color: #1e3a8a;">{formatted_total_cost}</span>
+        <div>
+            <span style="font-weight: 800; font-size: 11px; color: #1e40af; letter-spacing: 0.5px; display:block; text-transform: uppercase;">PACKAGE: {selected_global_display}</span>
+            <span style="font-weight: 700; font-size: 13px; color: #111827;">TOTAL CONSTRUCTION INVESTMENT (GST INC.):</span>
+        </div>
+        <span style="font-size: 22px; font-weight: 800; color: #1e3a8a;">{formatted_total_cost}</span>
     </div>
 
-    <div style="margin-top: 15px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 13px; color: #78350f;">
-        <b>⚡ Executive Special Commitments & Guarantees:</b>
-        <div style="color: #92400e; margin-top: 4px; font-size: 12px;">{additional_reqs}</div>
-    </div>
-
-    <div style="margin-top: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 12px; color: #4b5563;">
-        ⏳ <b>Commercial Notice:</b> This absolute construction quotation layout is highly strategic and remains strictly <b>valid for 30 days from the release date</b>.
+    <div style="margin-top: 15px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12px; color: #78350f;">
+        <div style="font-weight: 700; font-size:13px; text-transform: uppercase; margin-bottom:4px; color: #92400e;">⚡ Commercial Terms & Proposal Validity:</div>
+        • <b>Validity Note:</b> This official executive quotation is strictly <b>valid for 30 days</b> from the date of release.<br>
+        • <b>Inclusions:</b> All materials specified in the technical specifications matrix correspond directly to the customized choices.
+        <div style="color: #92400e; margin-top: 6px; font-weight: 600;">Additional Commitments: {additional_reqs}</div>
     </div>
 
     <div style="margin-top: 20px; border-top: 1px dashed #e5e7eb; padding-top: 15px;">
