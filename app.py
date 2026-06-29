@@ -6,8 +6,8 @@ import os
 # 1. PAGE SETUP & THEME
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER
-def get_image_source(file_name, fallback_url):
+# IMAGE CONFIGURATION HELPER (Single .jpg extension handling)
+def get_image_source(file_name):
     github_username = "sbbtdeepak"  
     github_repo = "SBBT-Designer-quotation"  
     return f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
@@ -135,11 +135,9 @@ for scope in additional_scopes:
 st.write("---")
 st.subheader("💳 Step 4: Smart Milestone Activation Control")
 
-final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=False, help="Is switch ko ON karne ke baad hi client quotation table me amounts details preview hongi.")
+final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=False)
 
-# Pure Milestone Pipeline Selection Based on Package Selected
 default_stages = []
-
 if "Solid Structure" in selected_global_display:
     pct_structure_per_floor = 8.4
     total_structure_pct = pct_structure_per_floor * total_floors
@@ -157,7 +155,7 @@ if "Solid Structure" in selected_global_display:
         floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
         default_stages.append({
             "stage": f"{floor_label} Structure & Brickwork Combined",
-            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts (Strict 8.4%).",
+            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
             "pct": pct_structure_per_floor
         })
 else:
@@ -245,42 +243,49 @@ for idx, milestone in enumerate(edited_stages):
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">{cost_display}</td>
     </tr>"""
 
-# IMAGE ASSIGNMENT
-images_html = ""
+# ALL IMAGES MAPPED WITH SINGLE .JPG EXTENSION AS CONFIRMED IN REPO
 if "Solid Structure" in selected_global_display:
     img_data = [
-        {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "RCC Core Frame", "file": "rcc_frame.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
-        {"title": "Robust Brickwork", "file": "brickwork.jpg", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"}
+        {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg"},
+        {"title": "RCC Core Frame", "file": "rcc_frame.jpg"},
+        {"title": "Robust Brickwork", "file": "brickwork.jpg"}
     ]
 elif "Essential" in selected_global_display:
     img_data = [
-        {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
-        {"title": "MS Main Gate", "file": "ms_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"}
+        {"title": "🏙️ Essential Elevation", "file": "elevation_essential.jpg"},
+        {"title": "MS Main Gate", "file": "ms_main_gate.jpg"},
+        {"title": "Flush Door", "file": "flush_door.jpg"},
+        {"title": "Basic Taps", "file": "basic_taps.jpg"},
+        {"title": "Basic WC", "file": "basic_wc.jpg"}
     ]
-else:
+else: # Premium Luxury Profile
     img_data = [
-        {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
-        {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
+        {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg"},
+        {"title": "Designer Main Door", "file": "designer_main_door.jpg"},
+        {"title": "Modular Kitchen", "file": "modular_kitchen.jpg"},
+        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg"},
+        {"title": "Glass Railing", "file": "glass_railing.jpg"},
+        {"title": "Wall Hung WC", "file": "basic_wc.jpg"},
+        {"title": "Premium Diverter", "file": "diverter.jpg"},
+        {"title": "False Ceiling", "file": "false_ceiling.jpg"},
+        {"title": "Heavy Elevator", "file": "elevator.jpg"},
+        {"title": "CCTV System", "file": "cctv_system.jpg"}
     ]
 
+images_html = ""
 for img in img_data:
-    resolved_src = get_image_source(img['file'], img['url'])
+    resolved_src = get_image_source(img['file'])
     is_elevation = "Elevation" in img['title'] or "Cladding" in img['title']
     bg_color = "#eff6ff" if is_elevation else "#ffffff"
     border_color = "#2563eb" if is_elevation else "#e5e7eb"
     
     images_html += f"""
-    <div style="text-align: center; width: 125px; margin: 6px; border: 1px solid {border_color}; border-radius: 8px; padding: 6px; background-color: {bg_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-        <img src="{resolved_src}" style="width: 110px; height: 90px; border-radius: 5px; object-fit: cover;" alt="{img['title']}" onerror="this.onerror=null; this.src='{img['url']}';">
+    <div style="text-align: center; width: 135px; margin: 6px; border: 1px solid {border_color}; border-radius: 8px; padding: 6px; background-color: {bg_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <img src="{resolved_src}" style="width: 120px; height: 95px; border-radius: 5px; object-fit: cover;" alt="{img['title']}">
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# BRANDS
+# BRANDS DATA DISPLAY FIXED
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
@@ -295,7 +300,7 @@ for brand in brands_data:
         <span style="font-size: 11px; font-weight: 700; color: #111827;">{brand['name']}</span>
     </div>"""
 
-# SPECIFICATION FROM EXCEL MATRIX
+# SPECIFICATION DIRECTIVES LOAD
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     for idx, row in df_matrix.iterrows():
@@ -305,7 +310,7 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
             excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
     specs_list = [
-        ("Structural Framework Elements", "M25 Premium Grade machine concrete core with strict engineering slump slump verification."),
+        ("Structural Framework Elements", "M25 Premium Grade machine concrete core with strict engineering slump verification."),
         ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D steel layouts."),
         ("Cement Infrastructure Base", "UltraTech Premium / Ambuja Kawach specialized high-strength weather-proof grade binders."),
         ("Waterproofing Protocol Systems", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions and terrace fields.")
@@ -313,7 +318,7 @@ else:
     for cat, spec in specs_list:
         excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# FLOOR COST ROW TABLE
+# FLOOR COST ROW TABLE ASSEMBLY
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -339,7 +344,7 @@ for scope in additional_scopes:
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
-# DYNAMIC PROPOSAL ASSEMBLY WITH NEW STRUCTURAL PAGES
+# DYNAMIC PROPOSAL ASSEMBLY WITH COMPLETE ESCAPING & ORDER RESOLUTION
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -431,7 +436,7 @@ proposal_html = f"""
             <li><b>Concrete Cube Compression:</b> 3 samples per monolithic pour tested at 7 and 28 days using precise calibrated hydraulic machinery.</li>
             <li><b>Steel Yield Elongation:</b> Double checking rebar cross-section weight-per-meter parameters to guarantee true Fe-550D structural performance.</li>
             <li><b>Water Quality Evaluation:</b> Chemical testing for pH balance and zero organic impurities to keep steel entirely rust-free over time.</li>
-            <li><li><b>Brick Efflorescence Test:</b> Soaking and saturation check to prevent salt release, safeguarding inside wall plastering.</li></li>
+            <li><b>Brick Efflorescence Test:</b> Soaking and saturation check to prevent salt release, safeguarding inside wall plastering.</li>
         </ul>
     </div>
 
@@ -522,7 +527,6 @@ window.onload = function() {{
 
 # SCREEN RENDERING PIPELINE
 st.write("### 💎 Live Executive Proposal Preview")
-st.caption("Niche diye gaye component ke dwara live breakdown check karein ya print out page download karein:")
 
 st.download_button(
     label="📥 Download & Save Proposal Page",
