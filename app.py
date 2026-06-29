@@ -6,7 +6,7 @@ import os
 # 1. PAGE SETUP & THEME
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER (Strict Single .jpg Extension)
+# IMAGE CONFIGURATION HELPER (Strict Single .jpg Extension from GitHub Repository)
 def get_image_source(file_name):
     github_username = "sbbtdeepak"  
     github_repo = "SBBT-Designer-quotation"  
@@ -212,7 +212,7 @@ for idx, milestone in enumerate(edited_stages):
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
     </tr>"""
 
-# COMPLETE PACKAGED IMAGES ARRAY (All Single Extensions from GitHub Repo Only)
+# RESTORED AND FULL COMPLETE IMAGES FOR EACH PACKAGE (Strictly Single .jpg)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_list = [
@@ -225,9 +225,11 @@ elif "Essential" in selected_global_display:
         {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg"},
         {"title": "MS Main Gate", "file": "ms_main_gate.jpg"},
         {"title": "MS Railing Setup", "file": "ms_railing.jpg"},
-        {"title": "Flush Door Leaf", "file": "flush_door.jpg"}
+        {"title": "Flush Door Leaf", "file": "flush_door.jpg"},
+        {"title": "Basic Taps Setup", "file": "basic_taps.jpg"},
+        {"title": "Standard WC", "file": "basic_wc.jpg"}
     ]
-else: # Premium Luxury Package - COMPLETE INCLUSIONS (Strictly Single .jpg)
+else: # Premium Luxury Profile Package - 100% Full Complete Images
     img_list = [
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg"},
@@ -243,17 +245,17 @@ for img in img_list:
     resolved_src = get_image_source(img['file'])
     images_html += f"""
     <div style="text-align: center; width: 135px; margin: 8px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
-        <img src="{resolved_src}" style="width: 115px; height: 95px; border-radius: 6px; object-fit: cover;" alt="{img['title']}">
+        <img src="{resolved_src}" style="width: 115px; height: 95px; border-radius: 6px; object-fit: cover;" alt="{img['title']}" onerror="this.style.display='none';">
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# COMPLETE STRATEGIC BRANDS DECK (100% COMPLETE)
+# COMPLETE STRATEGIC BRANDS DECK (100% Complete)
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
     {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Astral Pipes", "icon": "🚰"},
     {"name": "Berger Paints", "icon": "🎨"}, {"name": "Greenply Boards", "icon": "🌳"},
-    {"name": "Jaquar Fittings", "icon": " Shower"}, {"name": "Havells Cables", "icon": "⚡"}
+    {"name": "Jaquar Fittings", "icon": "🚿"}, {"name": "Havells Cables", "icon": "⚡"}
 ]
 brands_html = ""
 for brand in brands_data:
