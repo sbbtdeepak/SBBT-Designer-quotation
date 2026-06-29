@@ -6,15 +6,13 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER (DYNAMIC GITHUB SYNC)
+# IMAGE CONFIGURATION HELPER (FIXED FOR SBBTDEEPAK REPOSITORY)
 def get_image_source(file_name, fallback_url):
     """
     GitHub repository se images ko live aur automatic fetch karne ke liye global address generator.
     """
-    # 🔴 APNI DETIALS YAHA BADLIYE:
-    # 'deeep1sharma' aapka username lagaya hai, agar aapka repository name kuch aur hai toh 'sbbt-app' ki jagah wo likhein.
-    github_username = "deeep1sharma"  
-    github_repo = "sbbt-portal"  # <--- Apne GitHub repository ka exact naam yahan likhein (jaise: sbbt-app ya proposal-engine)
+    github_username = "sbbtdeepak"  
+    github_repo = "SBBT-Designer-quotation"  
     
     # Live URL framework for GitHub Raw Content
     github_raw_url = f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
@@ -179,7 +177,7 @@ else:
     else:
         excel_specs_html += "<li><b>Front Elevation:</b> Modern Design Elevation Framework with dynamic lighting controls.</li>"
 
-# 8. TABLE DATA ROWS
+# 8. TABLE DATA ROWS (FIXED LAYOUT COLUMN AS REQUESTED)
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -191,7 +189,7 @@ for item in floor_data:
         <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# 9. SAFE HTML STRING CONSTRUCT
+# 9. SAFE HTML STRING CONSTRUCT (FIXED TRIPLE QUOTE ISSUE)
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_built_up_str = f"{total_built_up:,} Total Built-up PSF"
 formatted_plot_ref_str = f"{plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)"
