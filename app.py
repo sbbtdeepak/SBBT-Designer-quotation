@@ -3,20 +3,14 @@ import pandas as pd
 import datetime
 import os
 
-# 1. PAGE SETUP
+# 1. PAGE SETUP & THEME
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER (FIXED FOR SBBTDEEPAK REPOSITORY)
+# IMAGE CONFIGURATION HELPER
 def get_image_source(file_name, fallback_url):
-    """
-    GitHub repository se images ko live aur automatic fetch karne ke liye global address generator.
-    """
     github_username = "sbbtdeepak"  
     github_repo = "SBBT-Designer-quotation"  
-    
-    # Live URL framework for GitHub Raw Content
-    github_raw_url = f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
-    return github_raw_url
+    return f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
 
 # 2. AUTOMATIC MATRIX LOADER
 @st.cache_data
@@ -78,9 +72,7 @@ with col2:
 plot_area_ft_ref = plot_area_yd * 9
 
 st.write("---")
-# DYNAMIC USER FLOOR-WISE ENTRY
 st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
-st.caption("Aap har floor ka Built-up Area, Layout Details (Text) aur Rate khud customize kar sakte hain:")
 
 floor_data = []
 total_built_up = 0.0
@@ -89,7 +81,7 @@ for i in range(total_floors):
     floor_label = "Ground Floor / Stilt" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
     
     st.markdown(f"#### 🏢 {floor_label}")
-    fl_col1, fl_col2, fl_col3 = st.columns([1.5, 1.5, 1.5])
+    fl_col1, fl_col2, fl_col3 = st.columns([1.5, 2.0, 1.5])
     
     with fl_col1:
         f_area = st.number_input(f"Built Area (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
@@ -104,7 +96,7 @@ for i in range(total_floors):
             min_p, max_p, def_p = 1500, 2000, 1659
         else:
             min_p, max_p, def_p = 2000, 3000, 2400
-        f_rate = st.number_input(f"Rate (Rs/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
+        f_rate = st.number_input(f"Rate (Rs/PSF)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
         
     floor_data.append({"floor": floor_label, "area": f_area, "layout": f_layout, "rate": f_rate})
     total_built_up += f_area
@@ -116,7 +108,7 @@ additional_reqs = st.text_area("Extra Strategic Commitments", "Includes speciali
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (Pulling from GitHub)
+# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -148,161 +140,195 @@ else: # Premium Luxury
         {"title": "Live CCTV System", "file": "cctv_system.jpg", "url": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=150&h=150&fit=crop"}
     ]
 
-# Render Image Section with clear beautiful flex grids
 for img in img_data:
     resolved_src = get_image_source(img['file'], img['url'])
     images_html += f"""
-    <div style="text-align: center; width: 130px; margin: 5px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; background-color: #fafafa;">
-        <img src="{resolved_src}" style="width: 110px; height: 95px; border-radius: 6px; object-fit: cover; border: 1px solid #d1d5db;" alt="{img['title']}" onerror="this.onerror=null; this.src='{img['url']}';">
-        <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #1f2937; line-height: 1.2;">{img['title']}</div>
+    <div style="text-align: center; width: 125px; margin: 6px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <img src="{resolved_src}" style="width: 110px; height: 90px; border-radius: 5px; object-fit: cover;" alt="{img['title']}" onerror="this.onerror=null; this.src='{img['url']}';">
+        <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #374151; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# 6. BRANDS ECOSYSTEM
-brands_list = ["Action Tesa", "Anchor", "Astral Pipes", "Berger", "SAINIK 710", "Chivas Ply", "Greenply", "Johnson Tiles", "Kajaria", "Kamdhenu NXT", "Kangaro", "Rathi Steel", "Rathi TMT", "SAINIK DOORS", "Somany", "Varmora"]
-brands_html = "".join([f"<span style='background-color: #f3f4f6; color: #1f2937; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb;'>{b}</span> " for b in brands_list])
+# 6. DYNAMIC BRAND LOGO RENDERING MATRIX
+brands_data = [
+    {"name": "Action Tesa", "icon": "🪵"}, {"name": "Anchor by Panasonic", "icon": "🔌"},
+    {"name": "Astral Pipes", "icon": "🚰"}, {"name": "Berger Paints", "icon": "🎨"},
+    {"name": "SAINIK 710 Ply", "icon": "🪓"}, {"name": "Chivas Ply", "icon": "🪵"},
+    {"name": "Greenply", "icon": "🌳"}, {"name": "Johnson Tiles", "icon": "🧱"},
+    {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Kamdhenu NXT", "icon": "🏗️"},
+    {"name": "Kangaro", "icon": "🔩"}, {"name": "Rathi Steel", "icon": "⛓️"},
+    {"name": "Somany Tiles", "icon": "🧱"}, {"name": "Varmora", "icon": "✨"}
+]
 
-# 7. MATRICES FROM EXCEL / FALLBACK
+brands_html = ""
+for brand in brands_data:
+    brands_html += f"""
+    <div style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 12px; min-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+        <span style="font-size: 16px;">{brand['icon']}</span>
+        <span style="font-size: 11px; font-weight: 700; color: #111827;">{brand['name']}</span>
+    </div>"""
+
+# 7. MATRICES / DYNAMIC SPECIFICATION LIST BUILDER
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     for idx, row in df_matrix.iterrows():
         cat = row['Category / Element'] if 'Category / Element' in df_matrix.columns else row.iloc[0]
         spec = row[selected_excel_col]
         if pd.notna(spec) and "Excluded" not in str(spec):
-            excel_specs_html += f"<li><b>{cat}:</b> {spec}</li>"
+            excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
-    if "Solid Structure" in selected_global_display:
-        excel_specs_html += "<li><b>Scope Definition:</b> Pure Structural Grey Structure Core Layout.</li><li><b>Concrete Grade:</b> Certified M25 Design Mix RMC Structure.</li>"
-    elif "Essential" in selected_global_display:
-        excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing.</li>"
-    else:
-        excel_specs_html += "<li><b>Front Elevation:</b> Modern Design Elevation Framework with dynamic lighting controls.</li>"
+    # Rich Hardcoded Specs to make document long & detailed if Excel is absent
+    specs_list = [
+        ("Foundation & Structural Framework", "Excavation, Anti-Termite core shield treatment, M20/M25 Grade robust machine mixed concrete."),
+        ("Steel & Reinforcement", "Exclusively TATA / JINDAL high-tensile structural steel reinforcement layout configuration."),
+        ("Masonry & Brickwork", "Premium Red Brick / AAC Block masonry with meticulous clean sand curing process framework."),
+        ("Plumbing & Drainage Network", "Concealed CPVC/UPVC architectural pipeline layouts via Astral or Finolex systems."),
+        ("Electrical Infrastructure", "Concealed heavy-duty fire-retardant wiring layouts using Polycab / Havells with modern sleek modular switch configurations."),
+        ("Premium Wall & Floor Finishes", "Vitrified large-format tiles (600x600mm / 800x800mm) by Kajaria, Somany, or Johnson tiles."),
+        ("Waterproofing Protocol", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions, bathrooms, and open terrace fields.")
+    ]
+    for cat, spec in specs_list:
+        excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# 8. TABLE DATA ROWS (FIXED LAYOUT COLUMN AS REQUESTED)
+# 8. FLOOR ROWS WITH COMPLETE CONFIGURATION DETAILS
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
     table_rows_html += f"""
     <tr style="border-bottom: 1px solid #e5e7eb;">
-        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 500;">{item['floor']}</td>
-        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 600;">{item['layout']}</td>
-        <td style="padding: 10px; font-size: 13px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
-        <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">Rs. {subtotal:,.2f}</td>
+        <td style="padding: 12px; font-size: 13px; color: #111827; font-weight: 600; background-color: #fafafa;">{item['floor']}</td>
+        <td style="padding: 12px; font-size: 13px; color: #2563eb; font-weight: 700;">{item['layout']}</td>
+        <td style="padding: 12px; font-size: 13px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
+        <td style="padding: 12px; font-size: 13px; color: #111827; text-align: center; font-weight: 600; color: #4b5563;">Rs. {item['rate']:,} / PSF</td>
+        <td style="padding: 12px; font-size: 13px; color: #111827; text-align: right; font-weight: 700;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# 9. SAFE HTML STRING CONSTRUCT (FIXED TRIPLE QUOTE ISSUE)
+# 9. MULTI-PAGE STRUCTURED PROPOSAL DESIGN
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_built_up_str = f"{total_built_up:,} Total Built-up PSF"
-formatted_plot_ref_str = f"{plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)"
+formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
 proposal_html = f"""
-<div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 35px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
+<div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #111827; padding-bottom: 15px;">
-        <div>
-            <h2 style="margin: 0; color: #111827; font-size: 22px; font-weight: 800; letter-spacing: 0.5px;">SHREE BADREE BUILD TECH PVT. LTD.</h2>
-            <div style="font-size: 11px; color: #6b7280; font-weight: 600; margin-top: 3px;">WHERE VISION MEETS PRECISION • TRUSTED PARTNER</div>
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #111827; padding-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0; color: #111827; font-size: 24px; font-weight: 800; letter-spacing: 0.5px;">SHREE BADREE BUILD TECH PVT. LTD.</h1>
+                <div style="font-size: 11px; color: #4b5563; font-weight: 700; margin-top: 4px; letter-spacing: 1px;">AN ISO 9001:2015 CERTIFIED CONSTRUCTION COMPANY</div>
+            </div>
+            <div style="text-align: right; background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 8px 14px; border-radius: 8px;">
+                <span style="font-size: 12px; font-weight: 800; color: #1e40af;">⭐ Google Rating: 4.9/5.0</span>
+            </div>
         </div>
-        <div style="text-align: right; background-color: #f3f4f6; padding: 6px 12px; border-radius: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: #2563eb;">⭐ Google Rating: 4.9/5.0</span>
+
+        <div style="margin-top: 25px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px;">
+            <div>
+                <span style="color:#6b7280; font-weight:700; text-transform:uppercase; font-size:10px; display:block; margin-bottom:4px;">Prepared For:</span>
+                <b>Client Name:</b> {client_name}<br>
+                <b>Site Location:</b> {project_address}<br>
+                <b>Proposal Framework:</b> <span style="color:#2563eb; font-weight:800;">{selected_global_display}</span>
+            </div>
+            <div style="text-align: right;">
+                <span style="color:#6b7280; font-weight:700; text-transform:uppercase; font-size:10px; display:block; margin-bottom:4px;">Document Control:</span>
+                <b>Quotation Index No:</b> SBBT/Q/2026/O95<br>
+                <b>Date of Generation:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
+                <b>Architectural Metric:</b> {formatted_plot_ref_str}
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; font-style: italic; font-size: 13.5px; color: #14532d; border-radius: 0 8px 8px 0; line-height: 1.5;">
+            "<b>Director's Note:</b> {custom_note}"
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">📋 1. Architectural Floor Structural Matrix</h3>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #111827; color: #ffffff;">
+                        <th style="padding: 12px; font-size: 12px; text-transform: uppercase;">Floor Level</th>
+                        <th style="padding: 12px; font-size: 12px; text-transform: uppercase;">Configuration & Details</th>
+                        <th style="padding: 12px; font-size: 12px; text-transform: uppercase; text-align: center;">Built-Up Area</th>
+                        <th style="padding: 12px; font-size: 12px; text-transform: uppercase; text-align: center;">Unit PSF Rate</th>
+                        <th style="padding: 12px; font-size: 12px; text-transform: uppercase; text-align: right;">Subtotal (INR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows_html}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 25px; background-color: #111827; border-radius: 8px; padding: 18px; display: flex; justify-content: space-between; align-items: center; color: #ffffff;">
+            <div>
+                <span style="font-size: 11px; color: #9ca3af; font-weight: 700; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Aggregated Investment Framework ({total_floors} Floors)</span>
+                <span style="font-size: 12px; color: #38bdf8; font-weight: 700;">Includes All Premium Workmanship, Machineries & Structural Supervision Components.</span>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 22px; font-weight: 800; color: #38bdf8;">{formatted_total_cost}</span>
+                <span style="font-size: 11px; display: block; color: #9ca3af;">Net Investment (Inclusive of GST)</span>
+            </div>
         </div>
     </div>
 
-    <div style="margin-top: 20px; display: flex; justify-content: space-between; font-size: 13px; color: #374151; line-height: 1.5;">
-        <div>
-            <b>Quotation Ref:</b> SBBT/Q/2026/095<br>
-            <b>Client Name:</b> {client_name}<br>
-            <b>Project Location:</b> {project_address}<br>
-            <b>Quotation Type:</b> <span style="color:#2563eb; font-weight:700;">{selected_global_display}</span>
-        </div>
-        <div style="text-align: right;">
-            <b>Date Issued:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
-            <b>Plot Frame Reference:</b> {formatted_plot_ref_str}<br>
-            <b>Total Structure Config:</b> {total_floors} Floors ({formatted_built_up_str})
-        </div>
-    </div>
-
-    <div style="margin-top: 15px; background-color: #fafafa; border-left: 3px solid #2563eb; padding: 12px; font-style: italic; font-size: 13px; color: #4b5563; border-radius: 0 6px 6px 0;">
-        "{custom_note}"
-    </div>
-
-    <div style="margin-top: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background-color: #ffffff;">
-        <div style="font-weight: 700; font-size: 12px; color: #111827; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 6px;">📸 Visual Scope Material Inclusion Details ({selected_global_display}):</div>
-        <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 2. Visual Scope Material Inclusion Details</h3>
+        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">Following premium architectural finishing units stand included strictly within the customized contract outline framework:</p>
+        
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
             {images_html}
         </div>
-    </div>
 
-    <div style="margin-top: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
-        <div style="font-weight: 700; font-size: 11px; color: #374151; margin-bottom: 8px; text-transform: uppercase;">🤝 Trusted Material Ecosystem Brands:</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 30px;">🤝 3. Associated Corporate Material Ecosystem Brands</h3>
+        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">We drive your luxury structure utilizing authentic supplies procured straight from India's benchmark production houses:</p>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: start; background: #ffffff; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 8px;">
             {brands_html}
         </div>
     </div>
 
-    <div style="margin-top: 20px;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="background-color: #111827; color: #ffffff;">
-                    <th style="padding: 10px; font-size: 13px;">Floor Profile Matrix</th>
-                    <th style="padding: 10px; font-size: 13px;">Layout & Configuration</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: center;">Built Area</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: right;">Subtotal (INR)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {table_rows_html}
-            </tbody>
-        </table>
-    </div>
-
-    <div style="margin-top: 20px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <span style="font-weight: 800; font-size: 11px; color: #1e40af; letter-spacing: 0.5px; display:block; text-transform: uppercase;">PACKAGE: {selected_global_display}</span>
-            <span style="font-weight: 700; font-size: 13px; color: #111827;">TOTAL CONSTRUCTION INVESTMENT (GST INC.):</span>
-        </div>
-        <span style="font-size: 22px; font-weight: 800; color: #1e3a8a;">{formatted_total_cost}</span>
-    </div>
-
-    <div style="margin-top: 15px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12px; color: #78350f;">
-        <div style="font-weight: 700; font-size:13px; text-transform: uppercase; margin-bottom:4px; color: #92400e;">⚡ Commercial Terms & Proposal Validity:</div>
-        • <b>Validity Note:</b> This official executive quotation is strictly <b>valid for 30 days</b> from the date of release.<br>
-        • <b>Inclusions:</b> All materials specified in the technical specifications matrix correspond directly to the customized choices.
-        <div style="color: #92400e; margin-top: 6px; font-weight: 600;">Additional Commitments: {additional_reqs}</div>
-    </div>
-
-    <div style="margin-top: 20px; border-top: 1px dashed #e5e7eb; padding-top: 15px;">
-        <div style="font-weight:700; font-size: 13px; color:#111827; margin-bottom: 6px;">🛡️ CORE PACK ARCHITECTURAL TECHNICAL SPECIFICATIONS:</div>
-        <ul style="padding-left:18px; font-size:12px; color:#4b5563; line-height: 1.5; margin: 0;">
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛠️ 4. Technical Specifications & Material Directives</h3>
+        <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 12px;">
             {excel_specs_html}
         </ul>
-    </div>
 
-    <div style="margin-top: 30px; border-top: 2px solid #111827; padding-top: 15px; display: flex; justify-content: space-between; font-size: 12px; color: #4b5563;">
-        <div>
-            <br>
-            <span style="font-size: 11px; color: #9ca3af; font-style: italic;">Authorized Signatory</span><br>
-            <b>Shree Badree Build Tech Pvt. Ltd.</b>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 30px;">🛡️ 5. Commercial Execution Terms & Guarantees</h3>
+        <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; font-size: 12.5px; color: #78350f; line-height: 1.6;">
+            • <b>Commercial Scope Validity:</b> This estimation ledger remains legally locked and **valid for exactly 30 days** from signature date.<br>
+            • <b>Quality Controls:</b> Execution monitored via comprehensive **100+ point systematic checklists** handled daily by the resident engineering desk.<br>
+            • <b>Site Monitoring Provision:</b> Live 24x7 infrastructure camera lines deployed post initial earthwork to enable client transparent verification.<br>
+            • <b>Strategic Accords:</b> {additional_reqs}
         </div>
-        <div style="text-align: right; line-height: 1.4;">
-            📞 +91 8800614403, 9625803339<br>
-            📧 deeep1sharma@gmail.com<br>
-            <span style="color: #2563eb; font-weight: 600;">Building Trust with Complete Transparency</span>
+
+        <div style="margin-top: 45px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
+            <div>
+                <br><br><br>
+                <span style="font-size: 11px; color: #9ca3af; font-style: italic; display:block; margin-bottom:2px;">Signature of Executive Authority</span>
+                <b>Shree Badree Build Tech Pvt. Ltd.</b>
+            </div>
+            <div style="text-align: right; line-height: 1.5; font-size: 12px; color: #111827;">
+                🏢 <b>Head Office:</b> New Delhi, NCR, India<br>
+                📞 <b>Contact Desk:</b> +91 8800614403, 9625803339<br>
+                📧 <b>Corporate Mail:</b> deeep1sharma@gmail.com<br>
+                🌐 <b>Digital Identity:</b> <a href="https://sbbt.in" style="color: #2563eb; text-decoration: none; font-weight: 700;">sbbt.in</a>
+            </div>
         </div>
     </div>
 
 </div>
 """
 
-# 10. PRINT CONFIGURATION VIA IFRAME COMPATIBLE HEADERS
+# 10. PRINT CONFIGURATION COMPONENT
 full_html_page = f"""<!DOCTYPE html><html><head><meta charset='utf-8'>
 <style>
 @media print {{
   body {{ padding: 0; background: #fff; }}
   .no-print {{ display: none !important; }}
+  div {{ page-break-inside: avoid; }}
 }}
 </style>
 </head>
-<body style='margin:0; padding:20px; background-color:#ffffff;'>
+<body style='margin:0; padding:15px; background-color:#ffffff;'>
 {proposal_html}
 <script>
 window.onload = function() {{
@@ -313,7 +339,7 @@ window.onload = function() {{
 
 # 11. UI INTERFACE DISPLAY
 st.write("### 💎 Live Executive Proposal Preview")
-st.caption("Aap niche diye gaye button par click karke direct print layout download kar sakte hain:")
+st.caption("Aap niche diye gaye button par click karke direct formal multiple-page layout download kar sakte hain:")
 
 st.download_button(
     label="📥 Download & Save Proposal Page",
