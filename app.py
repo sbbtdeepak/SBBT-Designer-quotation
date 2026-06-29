@@ -108,16 +108,18 @@ additional_reqs = st.text_area("Extra Strategic Commitments", "Includes speciali
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC
+# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (UPDATED WITH SPECIFIC FRONT ELEVATIONS)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
+        {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "RCC Core Frame", "file": "rcc_frame.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
         {"title": "Robust Brickwork", "file": "brickwork.jpg", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"},
         {"title": "Plaster Completed", "file": "plaster.jpg", "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop"}
     ]
 elif "Essential" in selected_global_display:
     img_data = [
+        {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
         {"title": "MS Main Gate", "file": "ms_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
         {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"},
@@ -128,6 +130,7 @@ elif "Essential" in selected_global_display:
     ]
 else: # Premium Luxury
     img_data = [
+        {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
         {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
@@ -142,13 +145,18 @@ else: # Premium Luxury
 
 for img in img_data:
     resolved_src = get_image_source(img['file'], img['url'])
+    # Highlight front elevation cards subtly with a specific badge style
+    is_elevation = "Elevation" in img['title'] or "Cladding" in img['title']
+    bg_color = "#eff6ff" if is_elevation else "#ffffff"
+    border_color = "#2563eb" if is_elevation else "#e5e7eb"
+    
     images_html += f"""
-    <div style="text-align: center; width: 125px; margin: 6px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+    <div style="text-align: center; width: 125px; margin: 6px; border: 1px solid {border_color}; border-radius: 8px; padding: 6px; background-color: {bg_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
         <img src="{resolved_src}" style="width: 110px; height: 90px; border-radius: 5px; object-fit: cover;" alt="{img['title']}" onerror="this.onerror=null; this.src='{img['url']}';">
-        <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #374151; line-height: 1.2;">{img['title']}</div>
+        <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# 6. DYNAMIC BRAND LOGO RENDERING MATRIX (UPDATED WITH HEAVY INFRASTRUCTURE BRANDS)
+# 6. DYNAMIC BRAND LOGO RENDERING MATRIX
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
@@ -176,7 +184,9 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
         if pd.notna(spec) and "Excluded" not in str(spec):
             excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
+    elevation_text = "Plain Textured Render / Classic Paint Finish Elevation Layout." if "Solid Structure" in selected_global_display else "Premium Weather-Proof Aluminium Composite Panel (ACP) Grid Elevation Configuration." if "Essential" in selected_global_display else "Ultra-Luxury High-Pressure Laminate (HPL) Cladding mixed with Toughened Architectural Glass Profile."
     specs_list = [
+        ("Front Elevation Facade", elevation_text),
         ("Structural Framework", "M25 Premium Grade heavy-duty machine concrete core with strict slump verification protocols."),
         ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D steel layouts."),
         ("Cement Infrastructure", "UltraTech Premium / Ambuja Kawach specialized weather-proof grade block casting & masonry binders."),
@@ -210,7 +220,6 @@ formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Re
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
-    <!-- PAGE 1: EXECUTIVE BRIEF & CORE IDENTITY -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #111827; padding-bottom: 20px;">
             <div>
@@ -271,7 +280,6 @@ proposal_html = f"""
         </div>
     </div>
 
-    <!-- PAGE 2: VISUAL SCOPE & BRAND ECOSYSTEM MATRIX -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 2. Visual Scope Material Inclusion Details</h3>
         <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">Following premium architectural finishing units stand included strictly within the customized contract outline framework:</p>
@@ -288,7 +296,6 @@ proposal_html = f"""
         </div>
     </div>
 
-    <!-- PAGE 3: TECHNICAL SPECIFICATIONS & COMPLIANCE CLAUSES -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛠️ 4. Technical Specifications & Material Directives</h3>
         <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 12px;">
@@ -303,7 +310,6 @@ proposal_html = f"""
             • <b>Strategic Accords:</b> {additional_reqs}
         </div>
 
-        <!-- CORPORATE SIGN-OFF MATRIX -->
         <div style="margin-top: 45px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
