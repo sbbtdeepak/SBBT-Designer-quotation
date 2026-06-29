@@ -6,16 +6,19 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER
+# IMAGE CONFIGURATION HELPER (DYNAMIC GITHUB SYNC)
 def get_image_source(file_name, fallback_url):
     """
-    Agar 'images' folder mein local file milti hai toh use static asset ki tarah lift karega,
-    nahi toh fallback cloud URL chalega.
+    GitHub repository se images ko live aur automatic fetch karne ke liye global address generator.
     """
-    local_path = os.path.join("images", file_name)
-    if os.path.exists(local_path):
-        return local_path
-    return fallback_url
+    # 🔴 APNI DETIALS YAHA BADLIYE:
+    # 'deeep1sharma' aapka username lagaya hai, agar aapka repository name kuch aur hai toh 'sbbt-app' ki jagah wo likhein.
+    github_username = "deeep1sharma"  
+    github_repo = "sbbt-portal"  # <--- Apne GitHub repository ka exact naam yahan likhein (jaise: sbbt-app ya proposal-engine)
+    
+    # Live URL framework for GitHub Raw Content
+    github_raw_url = f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
+    return github_raw_url
 
 # 2. AUTOMATIC MATRIX LOADER
 @st.cache_data
@@ -115,7 +118,7 @@ additional_reqs = st.text_area("Extra Strategic Commitments", "Includes speciali
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC NEW IMAGE DESIGN SECTION (Categorized exactly as per your specification)
+# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (Pulling from GitHub)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -152,7 +155,7 @@ for img in img_data:
     resolved_src = get_image_source(img['file'], img['url'])
     images_html += f"""
     <div style="text-align: center; width: 130px; margin: 5px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; background-color: #fafafa;">
-        <img src="{resolved_src}" style="width: 110px; height: 95px; border-radius: 6px; object-fit: cover; border: 1px solid #d1d5db;" alt="{img['title']}">
+        <img src="{resolved_src}" style="width: 110px; height: 95px; border-radius: 6px; object-fit: cover; border: 1px solid #d1d5db;" alt="{img['title']}" onerror="this.onerror=null; this.src='{img['url']}';">
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #1f2937; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
