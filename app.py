@@ -62,7 +62,7 @@ col1, col2 = st.columns(2)
 with col1:
     client_name = st.text_input("Client Name", "Mr. & Mrs. Sharma")
     project_address = st.text_input("Site Location/Address", "Palam, Gurgaon (HR)")
-    selected_global_display = st.selectbox("Select Master Package", list(package_options.keys()), index=2)
+    selected_global_display = st.selectbox("Select Master Package", list(package_options.keys()), index=0)
     selected_excel_col = package_options[selected_global_display]
 
 with col2:
@@ -78,7 +78,7 @@ floor_data = []
 total_built_up = 0.0
 
 if "Solid Structure" in selected_global_display:
-    def_rate_val = 1199
+    def_rate_val = 1200
 elif "Essential" in selected_global_display:
     def_rate_val = 1700
 else:
@@ -135,45 +135,58 @@ for scope in additional_scopes:
 st.write("---")
 st.subheader("💳 Step 4: Smart Milestone Activation Control")
 
-# CRITICAL TOGGLE AT THE MIDDLE OF PROCESS FOR MASTER LOCKING
 final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=False, help="Is switch ko ON karne ke baad hi client quotation table me amounts details preview hongi.")
 
-# Milestone Allocation Definitions
-pct_booking = 6.0
-pct_foundation = 10.0
-pct_plinth = 6.0
-pct_structure_per_floor = 8.4  # Exact User Override Constraint
+# Pure Milestone Pipeline Selection Based on Package Selected
+default_stages = []
 
-# Baseline Setup
-default_stages = [
-    {"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, architectural structural layouts alignment and legal authorization.", "pct": pct_booking},
-    {"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation work, PCC leveling layout, structural column footing mesh layout, and foundation monolithic base casting.", "pct": pct_foundation},
-    {"stage": "Plinth Level Integration Framework", "desc": "Plinth Beam structural frame execution, anti-termite ground treatment, sand filling, deep compaction, and specialized DPC protective layer setups.", "pct": pct_plinth}
-]
-
-# Structure Floor Wise Generation
-for i in range(total_floors):
-    floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
-    default_stages.append({
-        "stage": f"{floor_label} Structure & Brickwork Combined",
-        "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
-        "pct": pct_structure_per_floor
-    })
-
-default_stages.append({
-    "stage": "Electrical & Plumbing In-Wall Concealed Works",
-    "desc": "Chasing/jiri layout tracking in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity distribution lines.",
-    "pct": 5.0
-})
-
-default_stages.append({
-    "stage": "Floor-wise Internal & External Plaster Completion",
-    "desc": "Laying of precise rich-mortar cement internal surfaces plastering and synchronized outer high-strength weather-proof external finish plaster layouts.",
-    "pct": 8.0
-})
-
-# Dynamic Floor Wise Flooring Distribution
-if "Solid Structure" not in selected_global_display:
+if "Solid Structure" in selected_global_display:
+    # 1. FIX FLOOR STRUCTURE TO EXACTLY 8.4%
+    pct_structure_per_floor = 8.4
+    total_structure_pct = pct_structure_per_floor * total_floors
+    
+    # 2. REMAINDER DISTRIBUTION AMONG BASE FOUNDATION STAGES
+    remaining_pool = 100.0 - total_structure_pct
+    
+    # Baseline setup with dynamically tailored base percentages
+    pct_booking = round(remaining_pool * 0.28, 2)
+    pct_foundation = round(remaining_pool * 0.44, 2)
+    pct_plinth = round(100.0 - total_structure_pct - pct_booking - pct_foundation, 2)
+    
+    default_stages.append({"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, architectural structural layouts alignment and legal authorization.", "pct": pct_booking})
+    default_stages.append({"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation work, PCC leveling layout, structural column footing mesh layout, and foundation monolithic base casting.", "pct": pct_foundation})
+    default_stages.append({"stage": "Plinth Level Integration Framework", "desc": "Plinth Beam structural frame execution, anti-termite ground treatment, sand filling, deep compaction, and specialized DPC protective layer setups.", "pct": pct_plinth})
+    
+    # Floor Wise Structure Addition ONLY
+    for i in range(total_floors):
+        floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
+        default_stages.append({
+            "stage": f"{floor_label} Structure & Brickwork Combined",
+            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
+            "pct": pct_structure_per_floor
+        })
+else:
+    # Finishing Packages Flow (Essential / Premium Luxury)
+    pct_booking = 6.0
+    pct_foundation = 10.0
+    pct_plinth = 6.0
+    pct_structure_per_floor = 8.4
+    
+    default_stages.append({"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, architectural structural layouts alignment and legal authorization.", "pct": pct_booking})
+    default_stages.append({"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation work, PCC leveling layout, structural column footing mesh layout, and foundation monolithic base casting.", "pct": pct_foundation})
+    default_stages.append({"stage": "Plinth Level Integration Framework", "desc": "Plinth Beam structural frame execution, anti-termite ground treatment, sand filling, deep compaction, and specialized DPC protective layer setups.", "pct": pct_plinth})
+    
+    for i in range(total_floors):
+        floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
+        default_stages.append({
+            "stage": f"{floor_label} Structure & Brickwork Combined",
+            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
+            "pct": pct_structure_per_floor
+        })
+        
+    default_stages.append({"stage": "Electrical & Plumbing In-Wall Concealed Works", "desc": "Chasing/jiri layout tracking in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity distribution lines.", "pct": 5.0})
+    default_stages.append({"stage": "Floor-wise Internal & External Plaster Completion", "desc": "Laying of precise rich-mortar cement internal surfaces plastering and synchronized outer high-strength weather-proof external finish plaster layouts.", "pct": 8.0})
+    
     pct_flooring_pool = 12.0
     flooring_per_floor = round(pct_flooring_pool / total_floors, 2)
     for i in range(total_floors):
@@ -183,19 +196,18 @@ if "Solid Structure" not in selected_global_display:
             "desc": f"Installation of high-end vitrified tiling elements or premium granite layouts, specialized bathroom floor-to-wall tiling layouts, and kitchen counter slate setup frames.",
             "pct": flooring_per_floor
         })
-
+        
     default_stages.append({"stage": "Doors, Windows Frame & Security Railings Setup", "desc": "Fixing durable perimeter frames, secure window panels setups, high-strength inner flush door leaves, and architectural steel or glass handrails.", "pct": 8.0})
     default_stages.append({"stage": "Wall Smooth Putty, Base Paint & Premium Fixtures", "desc": "Dual coat structural wall putty treatment, base primers paint coatings, fixing designer modular switches, and structural sanitary systems execution.", "pct": 7.0})
-
-# Dynamically calculate remaining balance to maintain absolute 100% boundary
-allocated_sum = sum(stg['pct'] for stg in default_stages)
-pct_handover = round(max(0.0, 100.0 - allocated_sum), 2)
-
-default_stages.append({
-    "stage": "Final Custom Detailing, Deep Cleaning & Keys Handover",
-    "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.",
-    "pct": pct_handover
-})
+    
+    allocated_sum = sum(stg['pct'] for stg in default_stages)
+    pct_handover = round(max(0.0, 100.0 - allocated_sum), 2)
+    
+    default_stages.append({
+        "stage": "Final Custom Detailing, Deep Cleaning & Keys Handover",
+        "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.",
+        "pct": pct_handover
+    })
 
 edited_stages = []
 current_running_sum = 0.0
@@ -218,12 +230,11 @@ if current_running_sum != 100.0 and len(edited_stages) > 0:
 
 st.success("✅ Dynamic payment percentages synchronized seamlessly to 100.00% standard framework configuration!")
 
-# GENERATE HTML PREVIEW BLOCKS BASED ON TOGGLE STATE
+# GENERATE HTML PREVIEW BLOCKS
 payment_schedule_rows = ""
 for idx, milestone in enumerate(edited_stages):
     stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
     
-    # Hide details if switch is OFF
     if final_ok_switch:
         pct_display = f"{milestone['pct']:.2f}%"
         cost_display = f"Rs. {stage_calculated_cost:,.2f}"
@@ -246,8 +257,7 @@ if "Solid Structure" in selected_global_display:
     img_data = [
         {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "RCC Core Frame", "file": "rcc_frame.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
-        {"title": "Robust Brickwork", "file": "brickwork.jpg", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"},
-        {"title": "Plaster Completed", "file": "plaster.jpg", "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop"}
+        {"title": "Robust Brickwork", "file": "brickwork.jpg", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"}
     ]
 elif "Essential" in selected_global_display:
     img_data = [
@@ -256,7 +266,7 @@ elif "Essential" in selected_global_display:
         {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"}
     ]
-else: # Premium Luxury
+else:
     img_data = [
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
@@ -336,7 +346,7 @@ for scope in additional_scopes:
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
-# PRESENTATION GENERATOR ASSEMBLY
+# SAFELY INJECT STRINGS INTO HTML STRUCTURE (NO EMBEDDED PYTHON F-STRING CURLY CONFLICTS)
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -351,18 +361,18 @@ proposal_html = f"""
             </div>
         </div>
 
-        <div style="margin-top: 25px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px;">
-            <div>
-                <span style="color:#6b7280; font-weight:700; text-transform:uppercase; font-size:10px; display:block; margin-bottom:4px;">Prepared For:</span>
-                <b>Client Name:</b> {client_name}<br>
-                <b>Site Location:</b> {project_address}<br>
-                <b>Proposal Framework:</b> <span style="color:#2563eb; font-weight:800;">{selected_global_display}</span>
-            </div>
-            <div style="text-align: right;">
-                <span style="color:#6b7280; font-weight:700; text-transform:uppercase; font-size:10px; display:block; margin-bottom:4px;">Document Control:</span>
-                <b>Quotation Index No:</b> SBBT/Q/2026/O95<br>
-                <b>Date of Generation:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
-                <b>Architectural Metric:</b> {formatted_plot_ref_str}
+        <div style="margin-top: 25px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <b>Client Name:</b> {client_name}<br>
+                    <b>Site Location:</b> {project_address}<br>
+                    <b>Proposal Framework:</b> <span style="color:#2563eb; font-weight:800;">{selected_global_display}</span>
+                </div>
+                <div style="text-align: right;">
+                    <b>Quotation Index No:</b> SBBT/Q/2026/O95<br>
+                    <b>Date of Generation:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
+                    <b>Architectural Metric:</b> {formatted_plot_ref_str}
+                </div>
             </div>
         </div>
 
@@ -402,7 +412,7 @@ proposal_html = f"""
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">💳 2. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
-        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural or finishing dependencies safely:</p>
+        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural dependencies safely:</p>
         
         <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
             <thead>
@@ -451,13 +461,13 @@ proposal_html = f"""
         </div>
 
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">⏱️ 7. Payment Frequency & Clearing Protocols</h3>
-        <div style="background-color: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #115e59; line-height: 1.6; margin-top: 10px;">
+        <div style="background-color: #f0fdf4; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #115e59; line-height: 1.6; margin-top: 10px;">
             • <b>Invoice Generation Frequency:</b> Invoices will be raised strictly upon the formal 100% completion of each designated milestone stage listed in Section 2.<br>
             • <b>Verification Window:</b> Client is granted a 72-hour window post stage completion to audit site progress before payment release operations.<br>
             • <b>Clearing TAT:</b> All milestone payments must be credited via Bank Transfer (RTGS/NEFT) within 4 working days of invoice tracking to avoid logistical deployment halts.
         </div>
 
-        <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
+        <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
                 <span style="font-size: 11px; color: #9ca3af; font-style: italic; display:block; margin-bottom:2px;">Signature of Executive Authority</span>
@@ -474,12 +484,11 @@ proposal_html = f"""
 </div>
 """
 
-# PRINT INCLUSION MATRIX
+# HTML CONTAINER FOR PRINT OPERATIONS
 full_html_page = f"""<!DOCTYPE html><html><head><meta charset='utf-8'>
 <style>
 @media print {{
   body {{ padding: 0; background: #fff; }}
-  .no-print {{ display: none !important; }}
   div {{ page-break-inside: avoid; }}
 }}
 </style>
