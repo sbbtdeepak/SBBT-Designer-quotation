@@ -101,36 +101,37 @@ for i in range(total_floors):
     floor_data.append({"floor": floor_label, "area": f_area, "layout": f_layout, "rate": f_rate})
     total_built_up += f_area
 
-# NEW FEATURE: DYNAMIC TOGGLES FOR ADDITIONAL WORK SCOPE
+# 🛠️ UPDATED FEATURE: 100% DYNAMIC CLIENT DEFINED ADDITIONAL WORK SCOPE
 st.write("---")
-st.subheader("➕ Step 3: Additional Work Scope Customization (Optional)")
-st.caption("Agar client inme se koi add-on maange toh toggle on karein, yeh auto-pricing aur calculation table me load ho jayenge.")
+st.subheader("➕ Step 3: Client Defined Additional Work Scope")
+st.caption("Client ki requirement ke mutabik scope ka naam aur cost yahan daalein. Toggle ON hone par hi table me dikhega.")
 
-add_col1, add_col2, add_col3 = st.columns(3)
-with add_col1:
-    toggle_elevator = st.toggle("🛗 Heavy Elevator Setup", value=False)
-    rate_elevator = st.number_input("Elevator Lumpsum Cost (Rs.)", min_value=0, value=650000, step=10000, disabled=not toggle_elevator)
+additional_scopes = []
 
-with add_col2:
-    toggle_wall = st.toggle("🧱 Boundary Compound Wall", value=False)
-    rate_wall = st.number_input("Compound Wall Cost (Rs.)", min_value=0, value=180000, step=5000, disabled=not toggle_wall)
-
-with add_col3:
-    toggle_solar = st.toggle("☀️ Smart Solar Plant (5KW)", value=False)
-    rate_solar = st.number_input("Solar Plant Cost (Rs.)", min_value=0, value=250000, step=5000, disabled=not toggle_solar)
+for idx in range(3):
+    st.markdown(f"**Custom Scope Item {idx+1}**")
+    sc_col1, sc_col2, sc_col3 = st.columns([1.2, 2.3, 1.5])
+    
+    with sc_col1:
+        toggle_active = st.toggle(f"Enable Item {idx+1}", value=False, key=f"tg_active_{idx}")
+    
+    with sc_col2:
+        scope_name = st.text_input(f"Scope / Work Name", placeholder="e.g., Heavy Elevator / Boundary Wall", key=f"sc_name_{idx}", disabled=not toggle_active)
+    
+    with sc_col3:
+        scope_cost = st.number_input(f"Lumpsum Cost (Rs.)", min_value=0, value=0, step=5000, key=f"sc_cost_{idx}", disabled=not toggle_active)
+        
+    if toggle_active and scope_name.strip():
+        additional_scopes.append({"name": scope_name.strip(), "cost": scope_cost})
 
 st.write("---")
 custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
 additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
 
-# MATHEMATICAL COMPUTATION (INCLUDING TOGGLE SCOPES)
+# MATHEMATICAL COMPUTATION (DYNAMIC INTEGRATION)
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
-if toggle_elevator:
-    net_project_cost += rate_elevator
-if toggle_wall:
-    net_project_cost += rate_wall
-if toggle_solar:
-    net_project_cost += rate_solar
+for scope in additional_scopes:
+    net_project_cost += scope['cost']
 
 # 5. DYNAMIC IMAGE ASSIGNMENT LOGIC
 images_html = ""
@@ -222,7 +223,7 @@ else:
     for cat, spec in specs_list:
         excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# 8. FLOOR ROWS & ADDITIONAL INCLUSIONS (VISIBLE ONLY WHEN TOGGLED ON)
+# 8. FLOOR ROWS & CUSTOM SCOPES (VISIBLE ONLY IF ACTIVE)
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -235,35 +236,15 @@ for item in floor_data:
         <td style="padding: 12px; font-size: 13px; color: #111827; text-align: right; font-weight: 700;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# APPENDING ADDITIONAL SCOPES VISIBLY ONLY IF ENABLED
-if toggle_elevator:
+# APPENDING USER CUSTOM CLIENT DEFINED SCOPES
+for scope in additional_scopes:
     table_rows_html += f"""
     <tr style="border-bottom: 1px solid #e5e7eb; background-color: #f8fafc;">
         <td style="padding: 12px; font-size: 13px; color: #0f172a; font-weight: 700; background-color: #f1f5f9;">➕ Add-on Scope</td>
-        <td style="padding: 12px; font-size: 13px; color: #0284c7; font-weight: 700;">🛗 Heavy Elevator Setup (Complete Installation)</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">1 Unit</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Lumpsum</td>
-        <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {rate_elevator:,.2f}</td>
-    </tr>"""
-
-if toggle_wall:
-    table_rows_html += f"""
-    <tr style="border-bottom: 1px solid #e5e7eb; background-color: #f8fafc;">
-        <td style="padding: 12px; font-size: 13px; color: #0f172a; font-weight: 700; background-color: #f1f5f9;">➕ Add-on Scope</td>
-        <td style="padding: 12px; font-size: 13px; color: #0284c7; font-weight: 700;">🧱 Boundary Compound Wall Infrastructure</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Running Ft</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Lumpsum</td>
-        <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {rate_wall:,.2f}</td>
-    </tr>"""
-
-if toggle_solar:
-    table_rows_html += f"""
-    <tr style="border-bottom: 1px solid #e5e7eb; background-color: #f8fafc;">
-        <td style="padding: 12px; font-size: 13px; color: #0f172a; font-weight: 700; background-color: #f1f5f9;">➕ Add-on Scope</td>
-        <td style="padding: 12px; font-size: 13px; color: #0284c7; font-weight: 700;">☀️ Smart Solar Plant Integration (5KW On-Grid)</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Setup</td>
-        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Lumpsum</td>
-        <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {rate_solar:,.2f}</td>
+        <td style="padding: 12px; font-size: 13px; color: #0284c7; font-weight: 700;">✨ {scope['name']}</td>
+        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">1 Job</td>
+        <td style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">Custom Lumpsum</td>
+        <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {scope['cost']:,.2f}</td>
     </tr>"""
 
 # 9. MULTI-PAGE STRUCTURED PROPOSAL DESIGN
@@ -323,7 +304,7 @@ proposal_html = f"""
 
         <div style="margin-top: 25px; background-color: #111827; border-radius: 8px; padding: 18px; display: flex; justify-content: space-between; align-items: center; color: #ffffff;">
             <div>
-                <span style="font-size: 11px; color: #9ca3af; font-weight: 700; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Aggregated Investment Framework ({total_floors} Floors + Selected Custom Add-ons)</span>
+                <span style="font-size: 11px; color: #9ca3af; font-weight: 700; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Aggregated Investment Framework ({total_floors} Floors + Custom Client Add-ons)</span>
                 <span style="font-size: 12px; color: #38bdf8; font-weight: 700;">Includes All Structural Framework, Machineries, Material Inclusions & Supervision Elements.</span>
             </div>
             <div style="text-align: right;">
@@ -349,7 +330,7 @@ proposal_html = f"""
         </div>
     </div>
 
-    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛠️ 4. Technical Specifications & Material Directives</h3>
         <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 12px;">
             {excel_specs_html}
