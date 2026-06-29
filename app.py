@@ -148,21 +148,21 @@ for img in img_data:
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #374151; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# 6. DYNAMIC BRAND LOGO RENDERING MATRIX
+# 6. DYNAMIC BRAND LOGO RENDERING MATRIX (UPDATED WITH HEAVY INFRASTRUCTURE BRANDS)
 brands_data = [
-    {"name": "Action Tesa", "icon": "🪵"}, {"name": "Anchor by Panasonic", "icon": "🔌"},
-    {"name": "Astral Pipes", "icon": "🚰"}, {"name": "Berger Paints", "icon": "🎨"},
-    {"name": "SAINIK 710 Ply", "icon": "🪓"}, {"name": "Chivas Ply", "icon": "🪵"},
+    {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
+    {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
+    {"name": "ACC Cement", "icon": "💪"}, {"name": "Kajaria Tiles", "icon": "💎"},
+    {"name": "Action Tesa", "icon": "🪵"}, {"name": "Astral Pipes", "icon": "🚰"},
+    {"name": "Berger Paints", "icon": "🎨"}, {"name": "SAINIK 710 Ply", "icon": "🪓"},
     {"name": "Greenply", "icon": "🌳"}, {"name": "Johnson Tiles", "icon": "🧱"},
-    {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Kamdhenu NXT", "icon": "🏗️"},
-    {"name": "Kangaro", "icon": "🔩"}, {"name": "Rathi Steel", "icon": "⛓️"},
-    {"name": "Somany Tiles", "icon": "🧱"}, {"name": "Varmora", "icon": "✨"}
+    {"name": "Anchor Panasonic", "icon": "🔌"}, {"name": "Somany Tiles", "icon": "✨"}
 ]
 
 brands_html = ""
 for brand in brands_data:
     brands_html += f"""
-    <div style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 12px; min-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+    <div style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 12px; min-width: 145px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
         <span style="font-size: 16px;">{brand['icon']}</span>
         <span style="font-size: 11px; font-weight: 700; color: #111827;">{brand['name']}</span>
     </div>"""
@@ -176,11 +176,11 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
         if pd.notna(spec) and "Excluded" not in str(spec):
             excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
-    # Rich Hardcoded Specs to make document long & detailed if Excel is absent
     specs_list = [
-        ("Foundation & Structural Framework", "Excavation, Anti-Termite core shield treatment, M20/M25 Grade robust machine mixed concrete."),
-        ("Steel & Reinforcement", "Exclusively TATA / JINDAL high-tensile structural steel reinforcement layout configuration."),
-        ("Masonry & Brickwork", "Premium Red Brick / AAC Block masonry with meticulous clean sand curing process framework."),
+        ("Structural Framework", "M25 Premium Grade heavy-duty machine concrete core with strict slump verification protocols."),
+        ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D steel layouts."),
+        ("Cement Infrastructure", "UltraTech Premium / Ambuja Kawach specialized weather-proof grade block casting & masonry binders."),
+        ("Masonry & Brickwork", "Premium Grade red clay bricks / high-strength autoclaved blocks cured dynamically."),
         ("Plumbing & Drainage Network", "Concealed CPVC/UPVC architectural pipeline layouts via Astral or Finolex systems."),
         ("Electrical Infrastructure", "Concealed heavy-duty fire-retardant wiring layouts using Polycab / Havells with modern sleek modular switch configurations."),
         ("Premium Wall & Floor Finishes", "Vitrified large-format tiles (600x600mm / 800x800mm) by Kajaria, Somany, or Johnson tiles."),
@@ -210,6 +210,7 @@ formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Re
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
+    <!-- PAGE 1: EXECUTIVE BRIEF & CORE IDENTITY -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #111827; padding-bottom: 20px;">
             <div>
@@ -270,6 +271,7 @@ proposal_html = f"""
         </div>
     </div>
 
+    <!-- PAGE 2: VISUAL SCOPE & BRAND ECOSYSTEM MATRIX -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 2. Visual Scope Material Inclusion Details</h3>
         <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">Following premium architectural finishing units stand included strictly within the customized contract outline framework:</p>
@@ -286,6 +288,7 @@ proposal_html = f"""
         </div>
     </div>
 
+    <!-- PAGE 3: TECHNICAL SPECIFICATIONS & COMPLIANCE CLAUSES -->
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛠️ 4. Technical Specifications & Material Directives</h3>
         <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 12px;">
@@ -300,6 +303,7 @@ proposal_html = f"""
             • <b>Strategic Accords:</b> {additional_reqs}
         </div>
 
+        <!-- CORPORATE SIGN-OFF MATRIX -->
         <div style="margin-top: 45px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
