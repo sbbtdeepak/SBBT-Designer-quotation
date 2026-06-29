@@ -123,8 +123,9 @@ for idx in range(3):
     if toggle_active and scope_name.strip():
         additional_scopes.append({"name": scope_name.strip(), "cost": scope_cost})
 
-custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
-additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
+# INPUT WIDGETS DEFINITION
+custom_note_text = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
+additional_reqs_text = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
 
 # MATHEMATICAL PROJECT TOTALS
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
@@ -212,33 +213,39 @@ for idx, milestone in enumerate(edited_stages):
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
     </tr>"""
 
-# RESTORED AND FULL COMPLETE IMAGES FOR EACH PACKAGE (Strictly Single .jpg)
+# COMPLETE DYNAMIC IMAGES MAPPING FROM YOUR REPOSITORY LIST
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_list = [
         {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg"},
         {"title": "RCC Core Frame", "file": "rcc_frame.jpg"},
-        {"title": "Robust Brickwork", "file": "brickwork.jpg"}
+        {"title": "Robust Brickwork", "file": "brickwork.jpg"},
+        {"title": "Plaster Core Work", "file": "plaster.jpg"}
     ]
 elif "Essential" in selected_global_display:
     img_list = [
-        {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg"},
+        {"title": "🏙️ Essential Elevation", "file": "elevation_essential.jpg"},
+        {"title": "ACP Panel Layout", "file": "acp_elevation.jpg"},
         {"title": "MS Main Gate", "file": "ms_main_gate.jpg"},
         {"title": "MS Railing Setup", "file": "ms_railing.jpg"},
-        {"title": "Flush Door Leaf", "file": "flush_door.jpg"},
-        {"title": "Basic Taps Setup", "file": "basic_taps.jpg"},
+        {"title": "Flush Door System", "file": "flush_door.jpg"},
+        {"title": "Basic CP Taps", "file": "basic_taps.jpg"},
         {"title": "Standard WC", "file": "basic_wc.jpg"}
     ]
-else: # Premium Luxury Profile Package - 100% Full Complete Images
+else: # Premium Luxury Profile Package - Mapping All Ultra Luxury Assets
     img_list = [
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg"},
+        {"title": "Stainless Steel Gate", "file": "ss_main_gate.jpg"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg"},
         {"title": "Modular Kitchen Matrix", "file": "modular_kitchen.jpg"},
         {"title": "Designer Wardrobe Unit", "file": "designer_wardrobe.jpg"},
         {"title": "Glass Railing System", "file": "glass_railing.jpg"},
+        {"title": "SS Staircase Railing", "file": "ss_staircase_railing.jpg"},
         {"title": "Premium Diverter Unit", "file": "diverter.jpg"},
-        {"title": "Wall Hung WC", "file": "wall_hung_wc.jpg"},
-        {"title": "Designer False Ceiling", "file": "false_ceiling.jpg"}
+        {"title": "Wall Hung WC System", "file": "wall_hung_wc.jpg"},
+        {"title": "Luxury False Ceiling", "file": "false_ceiling.jpg"},
+        {"title": "Pop Cornice Styling", "file": "pop_cornice.jpg"},
+        {"title": "Granite Slab Finish", "file": "granite_slab.jpg"}
     ]
 
 for img in img_list:
@@ -249,7 +256,7 @@ for img in img_list:
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# COMPLETE STRATEGIC BRANDS DECK (100% Complete)
+# COMPLETE STRATEGIC BRANDS DECK 
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
@@ -314,7 +321,7 @@ milestone_section_html = ""
 if final_ok_switch:
     milestone_section_html = f"""
     <div style="margin-top: 30px; border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">💳 8. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">💳 2. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
         <p style="font-size:12px; color:#4b5563; margin-top:5px; margin-bottom:15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural dependencies safely:</p>
         <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
             <thead>
@@ -333,7 +340,7 @@ if final_ok_switch:
     </div>
     """
 
-# DYNAMIC PROPOSAL ASSEMBLY
+# DYNAMIC PROPOSAL ASSEMBLY (Fixed variables mapping error)
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -364,7 +371,7 @@ proposal_html = f"""
         </div>
 
         <div style="margin-top: 25px; background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; font-size: 13.5px; color: #14532d; border-radius: 0 8px 8px 0;">
-            <b>Director's Note:</b> {custom_note}
+            <b>Director's Note:</b> {custom_note_text}
         </div>
 
         <div style="margin-top: 30px;">
@@ -396,8 +403,10 @@ proposal_html = f"""
         </div>
     </div>
 
+    {milestone_section_html}
+
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px;">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">🛡️ 2. Structural Integrity & Earthquake Resistant Standards</h3>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">🛡️ 3. CORE STRUCTURAL COMPLIANCE & QUALITY ASSURANCES</h3>
         <p style="font-size: 12.5px; color: #374151; line-height: 1.6;">Shree Badree Build Tech follows national safety protocols strictly via Indian Standard codes:</p>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px; margin-top:12px;">
             <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
@@ -432,11 +441,9 @@ proposal_html = f"""
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">🛡️ 7. Commercial Execution Terms & Guarantees</h3>
         <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
             • <b>Commercial Validity:</b> Locked for 30 days from layout mapping.<br>
-            • <b>Strategic Accords:</b> {additional_reqs}
+            • <b>Strategic Accords:</b> {additional_reqs_text}
         </div>
     </div>
-
-    {milestone_section_html}
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-top: 30px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
