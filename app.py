@@ -6,11 +6,10 @@ import os
 # 1. PAGE SETUP & THEME
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# IMAGE CONFIGURATION HELPER (Optimized for single/double extension bypass)
+# IMAGE CONFIGURATION HELPER (Strict Single .jpg Extension)
 def get_image_source(file_name):
     github_username = "sbbtdeepak"  
     github_repo = "SBBT-Designer-quotation"  
-    # Directly pulling from main branch with single .jpg.jpg fallback as seen on GitHub structural logs
     return f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
 
 # 2. AUTOMATIC MATRIX LOADER
@@ -63,12 +62,12 @@ col1, col2 = st.columns(2)
 with col1:
     client_name = st.text_input("Client Name", "Mr. & Mrs. Sharma")
     project_address = st.text_input("Site Location/Address", "Palam, Gurgaon (HR)")
-    selected_global_display = st.selectbox("Select Master Package", list(package_options.keys()), index=2) # Defaulting to Premium for review
+    selected_global_display = st.selectbox("Select Master Package", list(package_options.keys()), index=2)
     selected_excel_col = package_options[selected_global_display]
 
 with col2:
     plot_area_yd = st.number_input("Plot Area Reference (Sq. Yards)", min_value=10, max_value=2000, value=100)
-    total_floors = st.slider("Number of Floors to Configure (e.g., G+1, G+3)", min_value=1, max_value=12, value=5)
+    total_floors = st.slider("Number of Floors to Configure", min_value=1, max_value=12, value=4)
 
 plot_area_ft_ref = plot_area_yd * 9
 
@@ -132,10 +131,10 @@ net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 for scope in additional_scopes:
     net_project_cost += scope['cost']
 
-# 📊 PAYMENT CONTROL
+# 📊 PAYMENT CONTROL (ON = FULL SHOW, OFF = FULL GAYAB)
 st.write("---")
 st.subheader("💳 Step 4: Smart Milestone Activation Control")
-final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=True)
+final_ok_switch = st.toggle("🔒 SHOW MILESTONE PAYMENT MATRIX ON PROPOSAL", value=True, help="Agar ye OFF hoga to final proposal se milestone table poori tarah gayab ho jayegi.")
 
 # Pure Milestone Pipeline Selection
 default_stages = []
@@ -204,61 +203,57 @@ if current_running_sum != 100.0 and len(edited_stages) > 0:
 payment_schedule_rows = ""
 for idx, milestone in enumerate(edited_stages):
     stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
-    pct_display = f"{milestone['pct']:.2f}%" if final_ok_switch else "🔒 Locked"
-    cost_display = f"Rs. {stage_calculated_cost:,.2f}" if final_ok_switch else "🔒 Pending Approval"
-        
     payment_schedule_rows += f"""
     <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px; font-size: 12.5px; color: #111827; font-weight: 700; background-color: #fafafa; text-align: center;">{idx+1}</td>
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 700;">{milestone['stage']}</td>
         <td style="padding: 10px; font-size: 12px; color: #4b5563; line-height:1.4;">{milestone['desc']}</td>
-        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 800; text-align: center; background-color: #f0fdf4;">{pct_display}</td>
-        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">{cost_display}</td>
+        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 800; text-align: center; background-color: #f0fdf4;">{milestone['pct']:.2f}%</td>
+        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
     </tr>"""
 
-# COMPLETE PACKAGED IMAGES ARRAY (Using explicit filenames from your single-extension cleanup)
+# COMPLETE PACKAGED IMAGES ARRAY (All Single Extensions from GitHub Repo Only)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_list = [
-        {"title": "📐 Plain Elevation", "file": "brickwork.jpg.jpg"}, # mapping to repository names safely
-        {"title": "RCC Core Frame", "file": "brickwork.jpg.jpg"},
-        {"title": "Robust Brickwork", "file": "brickwork.jpg.jpg"}
+        {"title": "📐 Plain Elevation", "file": "plain_elevation.jpg"},
+        {"title": "RCC Core Frame", "file": "rcc_frame.jpg"},
+        {"title": "Robust Brickwork", "file": "brickwork.jpg"}
     ]
 elif "Essential" in selected_global_display:
     img_list = [
-        {"title": "🏙️ Essential Elevation", "file": "elevation_essential.jpg.jpg"},
-        {"title": "MS Main Gate", "file": "ms_main_gate.jpg.jpg"},
-        {"title": "Flush Door Leaf", "file": "flush_door.jpg.jpg"},
-        {"title": "Basic Taps Setup", "file": "basic_taps.jpg.jpg"},
-        {"title": "Standard WC", "file": "basic_wc.jpg.jpg"}
+        {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg"},
+        {"title": "MS Main Gate", "file": "ms_main_gate.jpg"},
+        {"title": "MS Railing Setup", "file": "ms_railing.jpg"},
+        {"title": "Flush Door Leaf", "file": "flush_door.jpg"}
     ]
-else: # Premium Luxury Package Inclusions - FULL EXTENDED VIEW
+else: # Premium Luxury Package - COMPLETE INCLUSIONS (Strictly Single .jpg)
     img_list = [
-        {"title": "🏛️ HPL Cladding Elevation", "file": "elevation_essential.jpg.jpg"},
-        {"title": "Designer Main Door", "file": "designer_main_door.jpg.jpg"},
-        {"title": "Modular Kitchen Matrix", "file": "modular_kitchen.jpg.jpg"},
-        {"title": "Designer Wardrobe Unit", "file": "designer_wardrobe.jpg.jpg"},
-        {"title": "Glass Railing System", "file": "glass_railing.jpg.jpg"},
-        {"title": "Premium Diverter Unit", "file": "diverter.jpg.jpg"},
-        {"title": "Wall Hung WC", "file": "basic_wc.jpg.jpg"},
-        {"title": "Designer False Ceiling", "file": "false_ceiling.jpg.jpg"}
+        {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg"},
+        {"title": "Designer Main Door", "file": "designer_main_door.jpg"},
+        {"title": "Modular Kitchen Matrix", "file": "modular_kitchen.jpg"},
+        {"title": "Designer Wardrobe Unit", "file": "designer_wardrobe.jpg"},
+        {"title": "Glass Railing System", "file": "glass_railing.jpg"},
+        {"title": "Premium Diverter Unit", "file": "diverter.jpg"},
+        {"title": "Wall Hung WC", "file": "wall_hung_wc.jpg"},
+        {"title": "Designer False Ceiling", "file": "false_ceiling.jpg"}
     ]
 
 for img in img_list:
     resolved_src = get_image_source(img['file'])
     images_html += f"""
-    <div style="text-align: center; width: 140px; margin: 8px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
-        <img src="{resolved_src}" style="width: 120px; height: 100px; border-radius: 6px; object-fit: cover;" alt="{img['title']}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150';">
+    <div style="text-align: center; width: 135px; margin: 8px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+        <img src="{resolved_src}" style="width: 115px; height: 95px; border-radius: 6px; object-fit: cover;" alt="{img['title']}">
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# BRANDS (All missing strategic brands recovered and included here)
+# COMPLETE STRATEGIC BRANDS DECK (100% COMPLETE)
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
     {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Astral Pipes", "icon": "🚰"},
     {"name": "Berger Paints", "icon": "🎨"}, {"name": "Greenply Boards", "icon": "🌳"},
-    {"name": "Jaguar Fittings", "icon": "🚿"}, {"name": "Havells Cables", "icon": "⚡"}
+    {"name": "Jaquar Fittings", "icon": " Shower"}, {"name": "Havells Cables", "icon": "⚡"}
 ]
 brands_html = ""
 for brand in brands_data:
@@ -268,7 +263,7 @@ for brand in brands_data:
         <span style="font-size: 11.5px; font-weight: 700; color: #111827;">{brand['name']}</span>
     </div>"""
 
-# SPECIFICATIONS
+# SPECIFICATIONS LI GENERATION
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     for idx, row in df_matrix.iterrows():
@@ -311,6 +306,30 @@ for scope in additional_scopes:
 
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
+
+# TOGGLE CONDITIONAL BLOCK GENERATION (ON = FULL SHOW, OFF = FULL GAYAB)
+milestone_section_html = ""
+if final_ok_switch:
+    milestone_section_html = f"""
+    <div style="margin-top: 30px; border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">💳 8. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
+        <p style="font-size:12px; color:#4b5563; margin-top:5px; margin-bottom:15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural dependencies safely:</p>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #1f2937; color: #ffffff;">
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 40px;">S.No</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; width: 230px;">Milestone Stage</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase;">Detailed Technical Work Definition Scope</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 80px;">Stage %</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: right; width: 140px;">Due Amount (INR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {payment_schedule_rows}
+            </tbody>
+        </table>
+    </div>
+    """
 
 # DYNAMIC PROPOSAL ASSEMBLY
 proposal_html = f"""
@@ -407,30 +426,18 @@ proposal_html = f"""
         </ul>
     </div>
 
-    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">🛡️ 7. Commercial Execution Terms & Guarantees</h3>
         <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
             • <b>Commercial Validity:</b> Locked for 30 days from layout mapping.<br>
             • <b>Strategic Accords:</b> {additional_reqs}
         </div>
+    </div>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; margin-top: 25px;">💳 8. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
-        <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
-            <thead>
-                <tr style="background-color: #1f2937; color: #ffffff;">
-                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 40px;">S.No</th>
-                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; width: 230px;">Milestone Stage</th>
-                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase;">Detailed Technical Work Definition Scope</th>
-                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 80px;">Stage %</th>
-                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: right; width: 140px;">Due Amount (INR)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {payment_schedule_rows}
-            </tbody>
-        </table>
+    {milestone_section_html}
 
-        <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-top: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
                 <span style="font-size: 11px; color: #9ca3af; font-style: italic; display:block; margin-bottom:2px;">Signature of Executive Authority</span>
