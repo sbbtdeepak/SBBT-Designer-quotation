@@ -131,7 +131,7 @@ net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 for scope in additional_scopes:
     net_project_cost += scope['cost']
 
-# 📊 14. SMART DYNAMIC PAYMENT FRAMEWORK WITH TOGGLE LOCK
+# 📊 SMART DYNAMIC PAYMENT CONTROL & CALCULATION
 st.write("---")
 st.subheader("💳 Step 4: Smart Milestone Activation Control")
 
@@ -141,14 +141,10 @@ final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=
 default_stages = []
 
 if "Solid Structure" in selected_global_display:
-    # 1. FIX FLOOR STRUCTURE TO EXACTLY 8.4%
     pct_structure_per_floor = 8.4
     total_structure_pct = pct_structure_per_floor * total_floors
-    
-    # 2. REMAINDER DISTRIBUTION AMONG BASE FOUNDATION STAGES
     remaining_pool = 100.0 - total_structure_pct
     
-    # Baseline setup with dynamically tailored base percentages
     pct_booking = round(remaining_pool * 0.28, 2)
     pct_foundation = round(remaining_pool * 0.44, 2)
     pct_plinth = round(100.0 - total_structure_pct - pct_booking - pct_foundation, 2)
@@ -157,16 +153,14 @@ if "Solid Structure" in selected_global_display:
     default_stages.append({"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation work, PCC leveling layout, structural column footing mesh layout, and foundation monolithic base casting.", "pct": pct_foundation})
     default_stages.append({"stage": "Plinth Level Integration Framework", "desc": "Plinth Beam structural frame execution, anti-termite ground treatment, sand filling, deep compaction, and specialized DPC protective layer setups.", "pct": pct_plinth})
     
-    # Floor Wise Structure Addition ONLY
     for i in range(total_floors):
         floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
         default_stages.append({
             "stage": f"{floor_label} Structure & Brickwork Combined",
-            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
+            "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts (Strict 8.4%).",
             "pct": pct_structure_per_floor
         })
 else:
-    # Finishing Packages Flow (Essential / Premium Luxury)
     pct_booking = 6.0
     pct_foundation = 10.0
     pct_plinth = 6.0
@@ -230,7 +224,7 @@ if current_running_sum != 100.0 and len(edited_stages) > 0:
 
 st.success("✅ Dynamic payment percentages synchronized seamlessly to 100.00% standard framework configuration!")
 
-# GENERATE HTML PREVIEW BLOCKS
+# GENERATE HTML MILESTONE ROWS
 payment_schedule_rows = ""
 for idx, milestone in enumerate(edited_stages):
     stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
@@ -251,7 +245,7 @@ for idx, milestone in enumerate(edited_stages):
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">{cost_display}</td>
     </tr>"""
 
-# DYNAMIC IMAGE ASSIGNMENT LOGIC
+# IMAGE ASSIGNMENT
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -286,14 +280,13 @@ for img in img_data:
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# DYNAMIC BRAND LOGO RENDERING MATRIX
+# BRANDS
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
     {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Astral Pipes", "icon": "🚰"},
     {"name": "Berger Paints", "icon": "🎨"}, {"name": "Greenply", "icon": "🌳"}
 ]
-
 brands_html = ""
 for brand in brands_data:
     brands_html += f"""
@@ -302,7 +295,7 @@ for brand in brands_data:
         <span style="font-size: 11px; font-weight: 700; color: #111827;">{brand['name']}</span>
     </div>"""
 
-# SPECIFICATION LIST BUILDER
+# SPECIFICATION FROM EXCEL MATRIX
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     for idx, row in df_matrix.iterrows():
@@ -320,7 +313,7 @@ else:
     for cat, spec in specs_list:
         excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# GENERAL BREAKDOWN TABLE DATA GENERATION
+# FLOOR COST ROW TABLE
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -346,7 +339,7 @@ for scope in additional_scopes:
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
-# SAFELY INJECT STRINGS INTO HTML STRUCTURE (NO EMBEDDED PYTHON F-STRING CURLY CONFLICTS)
+# DYNAMIC PROPOSAL ASSEMBLY WITH NEW STRUCTURAL PAGES
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -411,7 +404,70 @@ proposal_html = f"""
     </div>
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">💳 2. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛡️ 2. Structural Integrity & Earthquake Resistant Standards</h3>
+        <p style="font-size: 12.5px; color: #374151; line-height: 1.6;">Shree Badree Build Tech follows national safety protocols strictly. The design framework is vetted against severe dynamic forces using Indian Standard codes:</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px; margin-top:12px;">
+            <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+                <b style="color:#1e3a8a; display:block; margin-bottom:4px;">🏗️ Structural Steel Ductility (IS 13920)</b>
+                Ensures the building frame handles strong vibrations smoothly without sudden brittle fractures or joint failures.
+            </div>
+            <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+                <b style="color:#1e3a8a; display:block; margin-bottom:4px;">🧱 Foundation Soil Loading (IS 1904)</b>
+                Excavation depths and footing sizes are mapped precisely to safe soil bearing capacity records, ensuring zero settlement.
+            </div>
+            <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+                <b style="color:#1e3a8a; display:block; margin-bottom:4px;">💎 Concrete Design Mix Criteria (IS 10262)</b>
+                Computerized weight batching keeps water-cement ratios perfectly balanced for optimal density and life.
+            </div>
+            <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+                <b style="color:#1e3a8a; display:block; margin-bottom:4px;">⛓️ Seismic Load Distribution (IS 1893)</b>
+                Advanced column-beam junction reinforcing safely dampens multi-directional lateral movements.
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🔬 3. On-Site Material Testing & Verification Protocols</h3>
+        <p style="font-size: 12.5px; color: #374151; line-height: 1.6;">Raw materials undergo systematic inspections before deployment to guarantee structural reliability:</p>
+        <ul style="padding-left:18px; font-size:12px; line-height:1.7; color:#4b5563; margin-top:8px;">
+            <li><b>Concrete Cube Compression:</b> 3 samples per monolithic pour tested at 7 and 28 days using precise calibrated hydraulic machinery.</li>
+            <li><b>Steel Yield Elongation:</b> Double checking rebar cross-section weight-per-meter parameters to guarantee true Fe-550D structural performance.</li>
+            <li><b>Water Quality Evaluation:</b> Chemical testing for pH balance and zero organic impurities to keep steel entirely rust-free over time.</li>
+            <li><li><b>Brick Efflorescence Test:</b> Soaking and saturation check to prevent salt release, safeguarding inside wall plastering.</li></li>
+        </ul>
+    </div>
+
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 4. Visual Scope Material Inclusion Details</h3>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
+            {images_html}
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🏢 5. Strategic Brand Tie-Ups</h3>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
+            {brands_html}
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛠️ 6. Technical Specifications & Material Directives</h3>
+        <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 10px;">
+            {excel_specs_html}
+        </ul>
+    </div>
+
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛡️ 7. Commercial Execution Terms & Guarantees</h3>
+        <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
+            • <b>Commercial Validity:</b> This document valuation parameters stand legally locked for 30 days from layout logging.<br>
+            • <b>Quality Controls:</b> Execution parameters tracked via comprehensive **100+ points system checklist** checks.<br>
+            • <b>Strategic Accords:</b> {additional_reqs}
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 20px;">⏱️ 8. Payment Frequency & Clearing Protocols</h3>
+        <div style="background-color: #f0fdf4; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #115e59; line-height: 1.6; margin-top: 10px;">
+            • <b>Invoice Generation Frequency:</b> Invoices will be raised strictly upon the formal 100% completion of each designated milestone stage listed in Section 9.<br>
+            • <b>Verification Window:</b> Client is granted a 72-hour window post stage completion to audit site progress before payment release operations.<br>
+            • <b>Clearing TAT:</b> All milestone payments must be credited via Bank Transfer (RTGS/NEFT) within 4 working days of invoice tracking to avoid logistical deployment halts.
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">💳 9. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
         <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural dependencies safely:</p>
         
         <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
@@ -428,44 +484,6 @@ proposal_html = f"""
                 {payment_schedule_rows}
             </tbody>
         </table>
-        
-        <div style="margin-top: 25px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-size: 12px; line-height: 1.5; color: #334155;">
-            <b style="color: #0f172a; text-transform: uppercase; display: block; margin-bottom: 5px;">⚡ Core Structural Compliance & Quality Assurances</b>
-            • All structural monolithic concrete pours will undergo strict cube sampling tests verified via independent NABL laboratory protocols.<br>
-            • Steel supplies are directly sourced from primary producers ensuring raw material certification tracking against rust or batch anomalies.<br>
-            • Any client-requested alterations inside layout spaces after structural casting milestones are initiated will attract distinct job sheets variation costs.
-        </div>
-    </div>
-
-    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 3. Visual Scope Material Inclusion Details</h3>
-        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
-            {images_html}
-        </div>
-
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🏢 4. Strategic Brand Tie-Ups</h3>
-        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
-            {brands_html}
-        </div>
-
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛠️ 5. Technical Specifications & Material Directives</h3>
-        <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 10px;">
-            {excel_specs_html}
-        </ul>
-
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛡️ 6. Commercial Execution Terms & Guarantees</h3>
-        <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
-            • <b>Commercial Validity:</b> This document valuation parameters stand legally locked for 30 days from layout logging.<br>
-            • <b>Quality Controls:</b> Execution parameters tracked via comprehensive **100+ points system checklist** checks.<br>
-            • <b>Strategic Accords:</b> {additional_reqs}
-        </div>
-
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">⏱️ 7. Payment Frequency & Clearing Protocols</h3>
-        <div style="background-color: #f0fdf4; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #115e59; line-height: 1.6; margin-top: 10px;">
-            • <b>Invoice Generation Frequency:</b> Invoices will be raised strictly upon the formal 100% completion of each designated milestone stage listed in Section 2.<br>
-            • <b>Verification Window:</b> Client is granted a 72-hour window post stage completion to audit site progress before payment release operations.<br>
-            • <b>Clearing TAT:</b> All milestone payments must be credited via Bank Transfer (RTGS/NEFT) within 4 working days of invoice tracking to avoid logistical deployment halts.
-        </div>
 
         <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
             <div>
