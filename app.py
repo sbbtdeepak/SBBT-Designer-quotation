@@ -77,13 +77,12 @@ st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
 floor_data = []
 total_built_up = 0.0
 
-# Base default rates setting based on user package specifications
 if "Solid Structure" in selected_global_display:
     def_rate_val = 1199
 elif "Essential" in selected_global_display:
-    def_rate_val = 1700  # 1100 Structure + 600 Finishing
+    def_rate_val = 1700
 else:
-    def_rate_val = 2300  # 1200 Structure + 1100 Finishing
+    def_rate_val = 2300
 
 for i in range(total_floors):
     floor_label = "Ground Floor / Stilt" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
@@ -106,7 +105,6 @@ for i in range(total_floors):
 # 🛠️ DYNAMIC CLIENT DEFINED ADDITIONAL WORK SCOPE
 st.write("---")
 st.subheader("➕ Step 3: Client Defined Additional Work Scope")
-st.caption("Client ki requirement ke mutabik scope ka naam aur cost yahan daalein. Toggle ON hone par hi table me dikhega.")
 
 additional_scopes = []
 for idx in range(3):
@@ -125,106 +123,92 @@ for idx in range(3):
     if toggle_active and scope_name.strip():
         additional_scopes.append({"name": scope_name.strip(), "cost": scope_cost})
 
-# Variable definition sequence fixed to prevent NameError
 custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
 additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
 
-# 🏗️ MATHEMATICAL PROJECT TOTALS
+# MATHEMATICAL PROJECT TOTALS
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 for scope in additional_scopes:
     net_project_cost += scope['cost']
 
-# 📊 14. SMART AUTO-GENERATED CONSTRUCTION STAGE PAYMENT LOGIC
+# 📊 14. SMART DYNAMIC PAYMENT FRAMEWORK WITH TOGGLE LOCK
 st.write("---")
-st.subheader("💳 Step 4: Smart Construction Stage Payments Calibration")
-st.caption("Aapke dynamic rates aur specified package ratio ke aadhar par system stage weightages auto-generate ho gayi hain.")
+st.subheader("💳 Step 4: Smart Milestone Activation Control")
 
-# Package Wise Exact Cost Bifurcation Rules
-if "Solid Structure" in selected_global_display:
-    str_cost_spec, fin_cost_spec = 1199.0, 0.0
-elif "Essential" in selected_global_display:
-    str_cost_spec, fin_cost_spec = 1100.0, 600.0
-else: # Premium Luxury
-    str_cost_spec, fin_cost_spec = 1200.0, 1100.0
+# CRITICAL TOGGLE AT THE MIDDLE OF PROCESS FOR MASTER LOCKING
+final_ok_switch = st.toggle("🔒 LOCK AND VERIFY MILESTONES (FINAL OK)", value=False, help="Is switch ko ON karne ke baad hi client quotation table me amounts details preview hongi.")
 
-total_cost_spec = str_cost_spec + fin_cost_spec
-structure_share = (str_cost_spec / total_cost_spec) * 100.0
-finishing_share = (fin_cost_spec / total_cost_spec) * 100.0
-
-# Fixed Milestones Values
+# Milestone Allocation Definitions
 pct_booking = 6.0
 pct_foundation = 10.0
 pct_plinth = 6.0
+pct_structure_per_floor = 8.4  # Exact User Override Constraint
 
-if structure_share < (pct_booking + pct_foundation + pct_plinth + 4.0):
-    structure_share = 100.0
-    finishing_share = 0.0
-
-remaining_structure = structure_share - (pct_booking + pct_foundation + pct_plinth)
-
-if finishing_share > 0:
-    pct_mep_concealed = round(remaining_structure * 0.12, 2)
-    pct_plaster_work = round(remaining_structure * 0.20, 2)
-else:
-    pct_mep_concealed = round(remaining_structure * 0.15, 2)
-    pct_plaster_work = round(remaining_structure * 0.25, 2)
-
-floor_pool_structure = remaining_structure - (pct_mep_concealed + pct_plaster_work)
-pct_per_floor = round(floor_pool_structure / total_floors, 2)
-
-if finishing_share > 0:
-    pct_flooring = round(finishing_share * 0.38, 2)
-    pct_doors_win = round(finishing_share * 0.28, 2)
-    pct_paint_fixt = round(finishing_share * 0.22, 2)
-    pct_handover = round(finishing_share - (pct_flooring + pct_doors_win + pct_paint_fixt), 2)
-else:
-    pct_flooring, pct_doors_win, pct_paint_fixt, pct_handover = 0.0, 0.0, 0.0, 0.0
-
+# Baseline Setup
 default_stages = [
-    {"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, and formal architectural layouts alignment.", "pct": pct_booking},
-    {"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation, PCC leveling layout, structural Column Footing mesh, and Foundation base casting.", "pct": pct_foundation},
-    {"stage": "Plinth Level Integration", "desc": "Plinth Beam structural frame execution, sand/internal aggregate filling, compaction, and specialized DPC sheet setup.", "pct": pct_plinth}
+    {"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, architectural structural layouts alignment and legal authorization.", "pct": pct_booking},
+    {"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation work, PCC leveling layout, structural column footing mesh layout, and foundation monolithic base casting.", "pct": pct_foundation},
+    {"stage": "Plinth Level Integration Framework", "desc": "Plinth Beam structural frame execution, anti-termite ground treatment, sand filling, deep compaction, and specialized DPC protective layer setups.", "pct": pct_plinth}
 ]
 
+# Structure Floor Wise Generation
 for i in range(total_floors):
     floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
     default_stages.append({
         "stage": f"{floor_label} Structure & Brickwork Combined",
-        "desc": f"Execution of vertical RCC columns, beam alignments, roof slab reinforcement grid casting, structural staircase layout, and complete outer/inner line bricks masonry work.",
-        "pct": pct_per_floor
+        "desc": f"Execution of vertical heavy RCC columns, beam alignments, roof slab grid layout casting, structural staircase installation, and complete outer/inner line brick wall masonry layouts.",
+        "pct": pct_structure_per_floor
     })
 
 default_stages.append({
     "stage": "Electrical & Plumbing In-Wall Concealed Works",
-    "desc": "Chasing/jiri layout in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity layout lines.",
-    "pct": pct_mep_concealed
+    "desc": "Chasing/jiri layout tracking in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity distribution lines.",
+    "pct": 5.0
 })
 
 default_stages.append({
     "stage": "Floor-wise Internal & External Plaster Completion",
-    "desc": "Laying of precise rich-mortar cement internal surfaces plastering and synchronized outer high-strength weather-proof external finish plaster base layouts.",
-    "pct": pct_plaster_work
+    "desc": "Laying of precise rich-mortar cement internal surfaces plastering and synchronized outer high-strength weather-proof external finish plaster layouts.",
+    "pct": 8.0
 })
 
-if finishing_share > 0:
-    default_stages.append({"stage": "Flooring & Architectural Tiling Work", "desc": "Installation of high-end vitrified tiling elements/granite layouts, premium bathroom floor-to-wall layouts, and counter setups.", "pct": pct_flooring})
-    default_stages.append({"stage": "Doors, Windows Frame & Security Railings", "desc": "Fixing durable perimeter frames, secure windows setups, high-strength inner flush door leaves, and architectural steel or glass handrails.", "pct": pct_doors_win})
-    default_stages.append({"stage": "Wall Smooth Putty, Base Paint & Premium Fixtures", "desc": "Dual coat structural wall putty treatment, base primers paint coatings, fixing designer modular switches, and structural sanitary systems execution.", "pct": pct_paint_fixt})
-    default_stages.append({"stage": "Final Detailing, Deep Cleaning & Keys Handover", "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.", "pct": pct_handover})
+# Dynamic Floor Wise Flooring Distribution
+if "Solid Structure" not in selected_global_display:
+    pct_flooring_pool = 12.0
+    flooring_per_floor = round(pct_flooring_pool / total_floors, 2)
+    for i in range(total_floors):
+        floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
+        default_stages.append({
+            "stage": f"{floor_label} Internal Flooring & Architectural Tiling Work",
+            "desc": f"Installation of high-end vitrified tiling elements or premium granite layouts, specialized bathroom floor-to-wall tiling layouts, and kitchen counter slate setup frames.",
+            "pct": flooring_per_floor
+        })
+
+    default_stages.append({"stage": "Doors, Windows Frame & Security Railings Setup", "desc": "Fixing durable perimeter frames, secure window panels setups, high-strength inner flush door leaves, and architectural steel or glass handrails.", "pct": 8.0})
+    default_stages.append({"stage": "Wall Smooth Putty, Base Paint & Premium Fixtures", "desc": "Dual coat structural wall putty treatment, base primers paint coatings, fixing designer modular switches, and structural sanitary systems execution.", "pct": 7.0})
+
+# Dynamically calculate remaining balance to maintain absolute 100% boundary
+allocated_sum = sum(stg['pct'] for stg in default_stages)
+pct_handover = round(max(0.0, 100.0 - allocated_sum), 2)
+
+default_stages.append({
+    "stage": "Final Custom Detailing, Deep Cleaning & Keys Handover",
+    "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.",
+    "pct": pct_handover
+})
 
 edited_stages = []
 current_running_sum = 0.0
 
 st.markdown("#### ✏️ Administrative Stage Percentage Overrides Controls")
 for idx, stg in enumerate(default_stages):
-    if stg['pct'] > 0 or finishing_share > 0 or idx < (3 + total_floors + 2):
-        st_col1, st_col2 = st.columns([3.6, 1.4])
-        with st_col1:
-            st.markdown(f"**Stage {idx+1}:** {stg['stage']}  \n*{stg['desc']}*")
-        with st_col2:
-            val_override = st.number_input("Stage % Allocation", min_value=0.0, max_value=100.0, value=float(stg['pct']), step=0.01, key=f"stg_override_pct_{idx}")
-            edited_stages.append({"stage": stg['stage'], "desc": stg['desc'], "pct": val_override})
-            current_running_sum += val_override
+    st_col1, st_col2 = st.columns([3.6, 1.4])
+    with st_col1:
+        st.markdown(f"**Stage {idx+1}:** {stg['stage']}  \n*{stg['desc']}*")
+    with st_col2:
+        val_override = st.number_input("Stage % Allocation", min_value=0.0, max_value=100.0, value=float(stg['pct']), step=0.01, key=f"stg_override_pct_{idx}")
+        edited_stages.append({"stage": stg['stage'], "desc": stg['desc'], "pct": val_override})
+        current_running_sum += val_override
 
 current_running_sum = round(current_running_sum, 2)
 if current_running_sum != 100.0 and len(edited_stages) > 0:
@@ -234,19 +218,29 @@ if current_running_sum != 100.0 and len(edited_stages) > 0:
 
 st.success("✅ Dynamic payment percentages synchronized seamlessly to 100.00% standard framework configuration!")
 
+# GENERATE HTML PREVIEW BLOCKS BASED ON TOGGLE STATE
 payment_schedule_rows = ""
 for idx, milestone in enumerate(edited_stages):
     stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
+    
+    # Hide details if switch is OFF
+    if final_ok_switch:
+        pct_display = f"{milestone['pct']:.2f}%"
+        cost_display = f"Rs. {stage_calculated_cost:,.2f}"
+    else:
+        pct_display = "🔒 Locked"
+        cost_display = "🔒 Pending Master Approval"
+        
     payment_schedule_rows += f"""
     <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px; font-size: 12.5px; color: #111827; font-weight: 700; background-color: #fafafa; text-align: center;">{idx+1}</td>
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 700;">{milestone['stage']}</td>
         <td style="padding: 10px; font-size: 12px; color: #4b5563; line-height:1.4;">{milestone['desc']}</td>
-        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 800; text-align: center; background-color: #f0fdf4;">{milestone['pct']:.2f}%</td>
-        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
+        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 800; text-align: center; background-color: #f0fdf4;">{pct_display}</td>
+        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">{cost_display}</td>
     </tr>"""
 
-# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC
+# DYNAMIC IMAGE ASSIGNMENT LOGIC
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -267,7 +261,7 @@ else: # Premium Luxury
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
+        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
     ]
 
 for img in img_data:
@@ -282,7 +276,7 @@ for img in img_data:
         <div style="font-size: 11px; font-weight: 700; margin-top: 6px; color: #111827; line-height: 1.2;">{img['title']}</div>
     </div>"""
 
-# 6. DYNAMIC BRAND LOGO RENDERING MATRIX
+# DYNAMIC BRAND LOGO RENDERING MATRIX
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
@@ -298,7 +292,7 @@ for brand in brands_data:
         <span style="font-size: 11px; font-weight: 700; color: #111827;">{brand['name']}</span>
     </div>"""
 
-# 7. SPECIFICATION LIST BUILDER
+# SPECIFICATION LIST BUILDER
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     for idx, row in df_matrix.iterrows():
@@ -308,15 +302,15 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
             excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
     specs_list = [
-        ("Structural Framework", "M25 Premium Grade heavy-duty machine concrete core with strict slump verification."),
+        ("Structural Framework Elements", "M25 Premium Grade machine concrete core with strict engineering slump slump verification."),
         ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D steel layouts."),
-        ("Cement Infrastructure", "UltraTech Premium / Ambuja Kawach specialized weather-proof grade binders."),
-        ("Waterproofing Protocol", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions and terrace fields.")
+        ("Cement Infrastructure Base", "UltraTech Premium / Ambuja Kawach specialized high-strength weather-proof grade binders."),
+        ("Waterproofing Protocol Systems", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions and terrace fields.")
     ]
     for cat, spec in specs_list:
         excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# 8. GENERAL BREAKDOWN TABLE DATA GENERATION
+# GENERAL BREAKDOWN TABLE DATA GENERATION
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -339,10 +333,10 @@ for scope in additional_scopes:
         <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {scope['cost']:,.2f}</td>
     </tr>"""
 
-# 9. FINAL MULTI-PAGE PRESENTATION DESIGN ASSEMBLY
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
+# PRESENTATION GENERATOR ASSEMBLY
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -424,6 +418,13 @@ proposal_html = f"""
                 {payment_schedule_rows}
             </tbody>
         </table>
+        
+        <div style="margin-top: 25px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-size: 12px; line-height: 1.5; color: #334155;">
+            <b style="color: #0f172a; text-transform: uppercase; display: block; margin-bottom: 5px;">⚡ Core Structural Compliance & Quality Assurances</b>
+            • All structural monolithic concrete pours will undergo strict cube sampling tests verified via independent NABL laboratory protocols.<br>
+            • Steel supplies are directly sourced from primary producers ensuring raw material certification tracking against rust or batch anomalies.<br>
+            • Any client-requested alterations inside layout spaces after structural casting milestones are initiated will attract distinct job sheets variation costs.
+        </div>
     </div>
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
@@ -449,6 +450,13 @@ proposal_html = f"""
             • <b>Strategic Accords:</b> {additional_reqs}
         </div>
 
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">⏱️ 7. Payment Frequency & Clearing Protocols</h3>
+        <div style="background-color: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #115e59; line-height: 1.6; margin-top: 10px;">
+            • <b>Invoice Generation Frequency:</b> Invoices will be raised strictly upon the formal 100% completion of each designated milestone stage listed in Section 2.<br>
+            • <b>Verification Window:</b> Client is granted a 72-hour window post stage completion to audit site progress before payment release operations.<br>
+            • <b>Clearing TAT:</b> All milestone payments must be credited via Bank Transfer (RTGS/NEFT) within 4 working days of invoice tracking to avoid logistical deployment halts.
+        </div>
+
         <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
@@ -466,7 +474,7 @@ proposal_html = f"""
 </div>
 """
 
-# 10. PRINT INCLUSION MATRIX
+# PRINT INCLUSION MATRIX
 full_html_page = f"""<!DOCTYPE html><html><head><meta charset='utf-8'>
 <style>
 @media print {{
@@ -485,7 +493,7 @@ window.onload = function() {{
 </script>
 </body></html>"""
 
-# 11. SCREEN RENDERING PIPELINE
+# SCREEN RENDERING PIPELINE
 st.write("### 💎 Live Executive Proposal Preview")
 st.caption("Niche diye gaye component ke dwara live breakdown check karein ya print out page download karein:")
 
