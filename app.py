@@ -66,7 +66,7 @@ with col2:
 plot_area_ft_ref = plot_area_yd * 9
 
 st.write("---")
-# NEW SECTION: DYNAMIC USER FLOOR-WISE ENTRY
+# DYNAMIC USER FLOOR-WISE ENTRY
 st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
 st.caption("Aap har floor ka Built-up Area aur Rate khud customize kar sakte hain:")
 
@@ -80,7 +80,6 @@ for i in range(total_floors):
     fl_col1, fl_col2 = st.columns(2)
     
     with fl_col1:
-        # User explicitly enters the area for this floor
         f_area = st.number_input(f"Built Area for {floor_label} (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
     
     with fl_col2:
@@ -90,7 +89,7 @@ for i in range(total_floors):
             min_p, max_p, def_p = 1500, 2000, 1699
         else:
             min_p, max_p, def_p = 2000, 3000, 2399
-        f_rate = st.number_input(f"Rate for {floor_label} (₹/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
+        f_rate = st.number_input(f"Rate for {floor_label} (Rs/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
         
     floor_data.append({"floor": floor_label, "area": f_area, "rate": f_rate})
     total_built_up += f_area
@@ -161,11 +160,15 @@ for item in floor_data:
     <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 500;">{item['floor']}</td>
         <td style="padding: 10px; font-size: 13px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
-        <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">\u20b9 {subtotal:,.2f}</td>
+        <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# 9. CONSTRUCTING PROPOSAL HTML WITH EXPLICIT STRINGS
-proposal_template = """
+# 9. SAFE HTML STRING CONSTRUCT (No trailing backslashes or character formatting conflicts)
+formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
+formatted_built_up_str = f"{total_built_up:,} Total Built-up PSF"
+formatted_plot_ref_str = f"{plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)"
+
+proposal_html = f"""
 <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 35px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
     
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #111827; padding-bottom: 15px;">
@@ -185,9 +188,9 @@ proposal_template = """
             <b>Project Location:</b> {project_address}
         </div>
         <div style="text-align: right;">
-            <b>Date Issued:</b> {date_issued}<br>
-            <b>Plot Frame Reference:</b> {plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)<br>
-            <b>Total Structure Config:</b> {total_floors} Floors ({total_built_up:,} Total Built-up PSF)
+            <b>Date Issued:</b> {datetime.date.today().strftime('%d %B %Y')}<br>
+            <b>Plot Frame Reference:</b> {formatted_plot_ref_str}<br>
+            <b>Total Structure Config:</b> {total_floors} Floors ({formatted_built_up_str})
         </div>
     </div>
 
@@ -226,7 +229,7 @@ proposal_template = """
 
     <div style="margin-top: 20px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: 700; font-size: 13px; color: #1e40af; letter-spacing: 0.3px;">TOTAL ESTIMATED CONSTRUCTION INVESTMENT (GST INCLUDED):</span>
-        <span style="font-size: 20px; font-weight: 800; color: #1e3a8a;">\u20b9 {net_project_cost:,.2f}</span>
+        <span style="font-size: 20px; font-weight: 800; color: #1e3a8a;">{formatted_total_cost}</span>
     </div>
 
     <div style="margin-top: 15px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 13px; color: #78350f;">
@@ -234,4 +237,58 @@ proposal_template = """
         <div style="color: #92400e; margin-top: 4px; font-size: 12px;">{additional_reqs}</div>
     </div>
 
-    <div
+    <div style="margin-top: 20px; border-top: 1px dashed #e5e7eb; padding-top: 15px;">
+        <div style="font-weight:700; font-size: 13px; color:#111827; margin-bottom: 6px;">🛡️ CORE PACK ARCHITECTURAL TECHNICAL SPECIFICATIONS:</div>
+        <ul style="padding-left:18px; font-size:12px; color:#4b5563; line-height: 1.5; margin: 0;">
+            {excel_specs_html}
+        </ul>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 2px solid #111827; padding-top: 15px; display: flex; justify-content: space-between; font-size: 12px; color: #4b5563;">
+        <div>
+            <br>
+            <span style="font-size: 11px; color: #9ca3af; font-style: italic;">Authorized Signatory</span><br>
+            <b>Shree Badree Build Tech Pvt. Ltd.</b>
+        </div>
+        <div style="text-align: right; line-height: 1.4;">
+            📞 +91 8800614403, 9625803339<br>
+            📧 deeep1sharma@gmail.com<br>
+            <span style="color: #2563eb; font-weight: 600;">Building Trust with Complete Transparency</span>
+        </div>
+    </div>
+
+</div>
+"""
+
+# 10. PRINT CONFIGURATION VIA IFRAME COMPATIBLE HEADERS
+full_html_page = f"""<!DOCTYPE html><html><head><meta charset='utf-8'>
+<style>
+@media print {{
+  body {{ padding: 0; background: #fff; }}
+  .no-print {{ display: none !important; }}
+}}
+</style>
+</head>
+<body style='margin:0; padding:20px; background-color:#ffffff;'>
+{proposal_html}
+<script>
+window.onload = function() {{
+    setTimeout(function() {{ window.print(); }}, 500);
+}};
+</script>
+</body></html>"""
+
+# 11. UI INTERFACE DISPLAY
+st.write("### 💎 Live Executive Proposal Preview")
+st.caption("Aap niche diye gaye button par click karke direct print layout download kar sakte hain:")
+
+st.download_button(
+    label="📥 Download & Save Proposal Page",
+    data=full_html_page,
+    file_name=f"SBBT_Proposal_{client_name.replace(' ', '_')}.html",
+    mime="text/html",
+    type="primary"
+)
+
+st.write("")
+st.markdown(proposal_html, unsafe_allow_html=True)
