@@ -125,12 +125,16 @@ for idx in range(3):
     if toggle_active and scope_name.strip():
         additional_scopes.append({"name": scope_name.strip(), "cost": scope_cost})
 
+# Variable definition sequence fixed to prevent NameError
+custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
+additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
+
 # 🏗️ MATHEMATICAL PROJECT TOTALS
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 for scope in additional_scopes:
     net_project_cost += scope['cost']
 
-# 📊 14. SMART AUTO-GENERATED CONSTRUCTION STAGE PAYMENT LOGIC WITH SPEC RATIO BIFURCATION
+# 📊 14. SMART AUTO-GENERATED CONSTRUCTION STAGE PAYMENT LOGIC
 st.write("---")
 st.subheader("💳 Step 4: Smart Construction Stage Payments Calibration")
 st.caption("Aapke dynamic rates aur specified package ratio ke aadhar par system stage weightages auto-generate ho gayi hain.")
@@ -152,26 +156,22 @@ pct_booking = 6.0
 pct_foundation = 10.0
 pct_plinth = 6.0
 
-# Safety Guardrail for lower-tier allocations
 if structure_share < (pct_booking + pct_foundation + pct_plinth + 4.0):
     structure_share = 100.0
     finishing_share = 0.0
 
 remaining_structure = structure_share - (pct_booking + pct_foundation + pct_plinth)
 
-# Dynamic allocation rules for MEP and Plaster works from Structure balance
 if finishing_share > 0:
     pct_mep_concealed = round(remaining_structure * 0.12, 2)
     pct_plaster_work = round(remaining_structure * 0.20, 2)
 else:
-    # If solid structure core only package (finishing is 0%), dedicate more allocation weights to these stages
     pct_mep_concealed = round(remaining_structure * 0.15, 2)
     pct_plaster_work = round(remaining_structure * 0.25, 2)
 
 floor_pool_structure = remaining_structure - (pct_mep_concealed + pct_plaster_work)
 pct_per_floor = round(floor_pool_structure / total_floors, 2)
 
-# Dynamic Breakdown of Finishing Component (Only if finishing share is greater than zero)
 if finishing_share > 0:
     pct_flooring = round(finishing_share * 0.38, 2)
     pct_doors_win = round(finishing_share * 0.28, 2)
@@ -180,14 +180,12 @@ if finishing_share > 0:
 else:
     pct_flooring, pct_doors_win, pct_paint_fixt, pct_handover = 0.0, 0.0, 0.0, 0.0
 
-# Base List Pipeline
 default_stages = [
     {"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, and formal architectural layouts alignment.", "pct": pct_booking},
     {"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation, PCC leveling layout, structural Column Footing mesh, and Foundation base casting.", "pct": pct_foundation},
     {"stage": "Plinth Level Integration", "desc": "Plinth Beam structural frame execution, sand/internal aggregate filling, compaction, and specialized DPC sheet setup.", "pct": pct_plinth}
 ]
 
-# Generate Dynamic combined stages for each floor as per core instruction rules
 for i in range(total_floors):
     floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
     default_stages.append({
@@ -196,7 +194,6 @@ for i in range(total_floors):
         "pct": pct_per_floor
     })
 
-# In-Wall Conduits must complete before Plaster stage
 default_stages.append({
     "stage": "Electrical & Plumbing In-Wall Concealed Works",
     "desc": "Chasing/jiri layout in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity layout lines.",
@@ -209,14 +206,12 @@ default_stages.append({
     "pct": pct_plaster_work
 })
 
-# Append finishing modules strictly only if package involves finishing allocations
 if finishing_share > 0:
     default_stages.append({"stage": "Flooring & Architectural Tiling Work", "desc": "Installation of high-end vitrified tiling elements/granite layouts, premium bathroom floor-to-wall layouts, and counter setups.", "pct": pct_flooring})
     default_stages.append({"stage": "Doors, Windows Frame & Security Railings", "desc": "Fixing durable perimeter frames, secure windows setups, high-strength inner flush door leaves, and architectural steel or glass handrails.", "pct": pct_doors_win})
     default_stages.append({"stage": "Wall Smooth Putty, Base Paint & Premium Fixtures", "desc": "Dual coat structural wall putty treatment, base primers paint coatings, fixing designer modular switches, and structural sanitary systems execution.", "pct": pct_paint_fixt})
     default_stages.append({"stage": "Final Detailing, Deep Cleaning & Keys Handover", "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.", "pct": pct_handover})
 
-# Administrative Percentage Controls Overrides Matrix
 edited_stages = []
 current_running_sum = 0.0
 
@@ -231,7 +226,6 @@ for idx, stg in enumerate(default_stages):
             edited_stages.append({"stage": stg['stage'], "desc": stg['desc'], "pct": val_override})
             current_running_sum += val_override
 
-# Automatic Percentage Auto-Adjustment Engine for 100% calculation safety match
 current_running_sum = round(current_running_sum, 2)
 if current_running_sum != 100.0 and len(edited_stages) > 0:
     difference_offset = round(100.0 - current_running_sum, 2)
@@ -240,7 +234,6 @@ if current_running_sum != 100.0 and len(edited_stages) > 0:
 
 st.success("✅ Dynamic payment percentages synchronized seamlessly to 100.00% standard framework configuration!")
 
-# Render HTML Stage rows
 payment_schedule_rows = ""
 for idx, milestone in enumerate(edited_stages):
     stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
@@ -274,7 +267,7 @@ else: # Premium Luxury
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
+        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
     ]
 
 for img in img_data:
@@ -380,7 +373,7 @@ proposal_html = f"""
         </div>
 
         <div style="margin-top: 25px; background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; font-style: italic; font-size: 13.5px; color: #14532d; border-radius: 0 8px 8px 0;">
-            "<b>Director's Note:</b> {custom_note}"
+            <b>Director's Note:</b> {custom_note}
         </div>
 
         <div style="margin-top: 30px;">
@@ -439,12 +432,17 @@ proposal_html = f"""
             {images_html}
         </div>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛠️ 4. Technical Specifications & Material Directives</h3>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🏢 4. Strategic Brand Tie-Ups</h3>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
+            {brands_html}
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛠️ 5. Technical Specifications & Material Directives</h3>
         <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 10px;">
             {excel_specs_html}
         </ul>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛡️ 5. Commercial Execution Terms & Guarantees</h3>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛡️ 6. Commercial Execution Terms & Guarantees</h3>
         <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
             • <b>Commercial Validity:</b> This document valuation parameters stand legally locked for 30 days from layout logging.<br>
             • <b>Quality Controls:</b> Execution parameters tracked via comprehensive **100+ points system checklist** checks.<br>
