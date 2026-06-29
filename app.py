@@ -60,28 +60,40 @@ with col1:
     selected_excel_col = package_options[selected_global_display]
 
 with col2:
-    plot_area_yd = st.number_input("Plot Area (Sq. Yards)", min_value=10, max_value=2000, value=150)
-    total_floors = st.slider("Number of Floors", min_value=1, max_value=6, value=3)
+    plot_area_yd = st.number_input("Plot Area Reference (Sq. Yards)", min_value=10, max_value=2000, value=150)
+    total_floors = st.slider("Number of Floors to Configure", min_value=1, max_value=6, value=3)
 
-plot_area_ft = plot_area_yd * 9
-total_built_up = plot_area_ft * total_floors
+plot_area_ft_ref = plot_area_yd * 9
 
 st.write("---")
-st.subheader("📐 Custom Floor Pricing Setup")
+# NEW SECTION: DYNAMIC USER FLOOR-WISE ENTRY
+st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
+st.caption("Aap har floor ka Built-up Area aur Rate khud customize kar sakte hain:")
 
 floor_data = []
+total_built_up = 0.0
+
 for i in range(total_floors):
     floor_label = "Ground Floor / Stilt" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
     
-    if "Solid Structure" in selected_global_display:
-        min_p, max_p, def_p = 1100, 1500, 1199
-    elif "Essential" in selected_global_display:
-        min_p, max_p, def_p = 1500, 2000, 1699
-    else:
-        min_p, max_p, def_p = 2000, 3000, 2399
+    st.markdown(f"#### 🏢 {floor_label}")
+    fl_col1, fl_col2 = st.columns(2)
+    
+    with fl_col1:
+        # User explicitly enters the area for this floor
+        f_area = st.number_input(f"Built Area for {floor_label} (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
+    
+    with fl_col2:
+        if "Solid Structure" in selected_global_display:
+            min_p, max_p, def_p = 1100, 1500, 1199
+        elif "Essential" in selected_global_display:
+            min_p, max_p, def_p = 1500, 2000, 1699
+        else:
+            min_p, max_p, def_p = 2000, 3000, 2399
+        f_rate = st.number_input(f"Rate for {floor_label} (₹/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
         
-    f_rate = st.number_input(f"Rate for {floor_label} (₹/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_{i}")
-    floor_data.append({"floor": floor_label, "area": plot_area_ft, "rate": f_rate})
+    floor_data.append({"floor": floor_label, "area": f_area, "rate": f_rate})
+    total_built_up += f_area
 
 st.write("---")
 custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
@@ -90,7 +102,7 @@ additional_reqs = st.text_area("Extra Strategic Commitments", "Includes 15+ luxu
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. IMAGE CONFIGURATION
+# 5. DYNAMIC IMAGE CONFIGURATION
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -122,7 +134,7 @@ for img in img_data:
     </div>"""
 
 # 6. BRANDS ECOSYSTEM
-brands_list = ["Somany", "Nitco", "Kajaria", "Jaquar", "Hindware", "Cera", "Tata Tiscon", "Sail", "Kangaroo Ply", "Chivas Ply", "Havells", "Polycab", "Greenply", "Sainik Door", "Plaza Locks", "Godrej Locks", "Century Ply", "Astral Pipes", "Orient Electric", "Syntex"]
+brands_list = ["Action Tesa", "Anchor", "Astral Pipes", "Berger", "SAINIK 710", "Chivas Ply", "Greenply", "Johnson Tiles", "Kajaria", "Kamdhenu NXT", "Kangaro", "Rathi Steel", "Rathi TMT", "SAINIK DOORS", "Somany", "Varmora"]
 brands_html = "".join([f"<span style='background-color: #f3f4f6; color: #1f2937; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb;'>{b}</span> " for b in brands_list])
 
 # 7. MATRICES FROM EXCEL / FALLBACK
@@ -152,7 +164,7 @@ for item in floor_data:
         <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">\u20b9 {subtotal:,.2f}</td>
     </tr>"""
 
-# 9. CONSTRUCTING SAFE STRINGS (Isolating JS script from Python formatting blocks)
+# 9. CONSTRUCTING PROPOSAL HTML WITH EXPLICIT STRINGS
 proposal_template = """
 <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 35px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
     
@@ -174,8 +186,8 @@ proposal_template = """
         </div>
         <div style="text-align: right;">
             <b>Date Issued:</b> {date_issued}<br>
-            <b>Plot Size:</b> {plot_area_yd} Yd ({plot_area_ft} Sq.Ft)<br>
-            <b>Total Floors:</b> {total_floors} Floors ({total_built_up:,} Built-up PSF)
+            <b>Plot Frame Reference:</b> {plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)<br>
+            <b>Total Structure Config:</b> {total_floors} Floors ({total_built_up:,} Total Built-up PSF)
         </div>
     </div>
 
@@ -201,8 +213,8 @@ proposal_template = """
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background-color: #111827; color: #ffffff;">
-                    <th style="padding: 10px; font-size: 13px;">Floor Profile Matrix</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: center;">Built Area</th>
+                    <th style="padding: 10px; font-size: 13px;">Floor Layout & Built Profile</th>
+                    <th style="padding: 10px; font-size: 13px; text-align: center;">Configured Area</th>
                     <th style="padding: 10px; font-size: 13px; text-align: right;">Subtotal (INR)</th>
                 </tr>
             </thead>
@@ -222,64 +234,4 @@ proposal_template = """
         <div style="color: #92400e; margin-top: 4px; font-size: 12px;">{additional_reqs}</div>
     </div>
 
-    <div style="margin-top: 20px; border-top: 1px dashed #e5e7eb; padding-top: 15px;">
-        <div style="font-weight:700; font-size: 13px; color:#111827; margin-bottom: 6px;">🛡️ CORE PACK ARCHITECTURAL TECHNICAL SPECIFICATIONS:</div>
-        <ul style="padding-left:18px; font-size:12px; color:#4b5563; line-height: 1.5; margin: 0;">
-            {excel_specs_html}
-        </ul>
-    </div>
-
-    <div style="margin-top: 30px; border-top: 2px solid #111827; padding-top: 15px; display: flex; justify-content: space-between; font-size: 12px; color: #4b5563;">
-        <div>
-            <br>
-            <span style="font-size: 11px; color: #9ca3af; font-style: italic;">Authorized Signatory</span><br>
-            <b>Shree Badree Build Tech Pvt. Ltd.</b>
-        </div>
-        <div style="text-align: right; line-height: 1.4;">
-            📞 +91 8800614403, 9625803339<br>
-            📧 deeep1sharma@gmail.com<br>
-            <span style="color: #2563eb; font-weight: 600;">Building Trust with Complete Transparency</span>
-        </div>
-    </div>
-
-</div>
-"""
-
-proposal_html = proposal_template.format(
-    client_name=client_name,
-    project_address=project_address,
-    date_issued=datetime.date.today().strftime('%d %B %Y'),
-    plot_area_yd=plot_area_yd,
-    plot_area_ft=plot_area_ft,
-    total_floors=total_floors,
-    total_built_up=total_built_up,
-    custom_note=custom_note,
-    images_html=images_html,
-    brands_html=brands_html,
-    table_rows_html=table_rows_html,
-    net_project_cost=net_project_cost,
-    additional_reqs=additional_reqs,
-    excel_specs_html=excel_specs_html
-)
-
-# PRINT CONTROLLER VIA EMBEDDED JAVASCRIPT WINDOW
-full_html_page = """<!DOCTYPE html><html><head><meta charset='utf-8'></head>
-<body style='margin:0; padding:20px; background-color:#ffffff;'>
-{}
-<script>window.onload = function() {{ window.print(); }};</script>
-</body></html>""".format(proposal_html)
-
-# 10. UI PRESENTATION GATEWAY
-st.write("### 💎 Live Executive Proposal Preview")
-st.caption("Neeche click karke direct proposal save ya print kar sakte hain:")
-
-st.download_button(
-    label="🖨️ Generate & Save Official PDF",
-    data=full_html_page,
-    file_name=f"SBBT_Premium_Quotation_{client_name.replace(' ', '_')}.html",
-    mime="text/html",
-    type="primary"
-)
-
-st.write("")
-st.markdown(proposal_html, unsafe_allow_html=True)
+    <div
