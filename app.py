@@ -6,6 +6,17 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
+# IMAGE CONFIGURATION HELPER
+def get_image_source(file_name, fallback_url):
+    """
+    Agar 'images' folder mein local file milti hai toh use static asset ki tarah lift karega,
+    nahi toh fallback cloud URL chalega.
+    """
+    local_path = os.path.join("images", file_name)
+    if os.path.exists(local_path):
+        return local_path
+    return fallback_url
+
 # 2. AUTOMATIC MATRIX LOADER
 @st.cache_data
 def load_sbbt_matrix():
@@ -83,7 +94,6 @@ for i in range(total_floors):
         f_area = st.number_input(f"Built Area (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
     
     with fl_col2:
-        # NEW FIELD: Enables text/numbers custom description for Layout column (Green Mark Area)
         f_layout = st.text_input(f"Layout Configuration", value="3 BHK with Attach Bathroom" if i > 0 else "Stilt Parking + 1 Office", key=f"layout_val_{i}")
         
     with fl_col3:
@@ -105,34 +115,35 @@ additional_reqs = st.text_area("Extra Strategic Commitments", "Includes 15+ luxu
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC IMAGE CONFIGURATION
+# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (Local + Cloud Fallback)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
-        {"title": "RCC Core Frame", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
-        {"title": "Robust Brickwork", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"},
-        {"title": "Plaster Completed", "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop"}
+        {"title": "RCC Core Frame", "file": "rcc_frame.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
+        {"title": "Robust Brickwork", "file": "brickwork.jpg", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"},
+        {"title": "Plaster Completed", "file": "plaster.jpg", "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop"}
     ]
 elif "Essential" in selected_global_display:
     img_data = [
-        {"title": "Basic MS Gate Layout", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "Premium Internal Doors", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "Modern Front Elevation", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"}
+        {"title": "Basic MS Gate Layout", "file": "ms_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
+        {"title": "Premium Internal Doors", "file": "doors.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "Modern Front Elevation", "file": "elevation_essential.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"}
     ]
 else:
     img_data = [
-        {"title": "Modular Luxury Kitchen", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobes", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
-        {"title": "Heavy Glass Railings", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
-        {"title": "Wall-Hung WC Layout", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Automatic Elevator", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
-        {"title": "Bespoke False Ceiling", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"}
+        {"title": "Modular Luxury Kitchen", "file": "kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
+        {"title": "Designer Wardrobes", "file": "wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
+        {"title": "Heavy Glass Railings", "file": "glass_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
+        {"title": "Wall-Hung WC Layout", "file": "toilet.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
+        {"title": "Automatic Elevator", "file": "elevator.jpg", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
+        {"title": "Bespoke False Ceiling", "file": "ceiling.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"}
     ]
 
 for img in img_data:
+    resolved_src = get_image_source(img['file'], img['url'])
     images_html += f"""
     <div style="text-align: center; width: 110px;">
-        <img src="{img['url']}" style="width: 85px; height: 85px; border-radius: 12px; object-fit: cover; border: 2px solid #2563eb;" alt="{img['title']}">
+        <img src="{resolved_src}" style="width: 85px; height: 85px; border-radius: 12px; object-fit: cover; border: 2px solid #2563eb;" alt="{img['title']}">
         <div style="font-size: 11px; font-weight: 600; margin-top: 6px; color: #374151;">{img['title']}</div>
     </div>"""
 
