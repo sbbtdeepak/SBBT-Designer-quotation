@@ -67,7 +67,7 @@ with col1:
 
 with col2:
     plot_area_yd = st.number_input("Plot Area Reference (Sq. Yards)", min_value=10, max_value=2000, value=150)
-    total_floors = st.slider("Number of Floors to Configure", min_value=1, max_value=6, value=3)
+    total_floors = st.slider("Number of Floors to Configure (e.g., G+1, G+3)", min_value=1, max_value=12, value=3)
 
 plot_area_ft_ref = plot_area_yd * 9
 
@@ -76,6 +76,14 @@ st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
 
 floor_data = []
 total_built_up = 0.0
+
+# Base default rates setting based on user package specifications
+if "Solid Structure" in selected_global_display:
+    def_rate_val = 1199
+elif "Essential" in selected_global_display:
+    def_rate_val = 1700  # 1100 Structure + 600 Finishing
+else:
+    def_rate_val = 2300  # 1200 Structure + 1100 Finishing
 
 for i in range(total_floors):
     floor_label = "Ground Floor / Stilt" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
@@ -90,24 +98,17 @@ for i in range(total_floors):
         f_layout = st.text_input(f"Layout Configuration", value="3 BHK with Attach Bathroom" if i > 0 else "Stilt Parking + 1 Office", key=f"layout_val_{i}")
         
     with fl_col3:
-        if "Solid Structure" in selected_global_display:
-            min_p, max_p, def_p = 1100, 1500, 1199
-        elif "Essential" in selected_global_display:
-            min_p, max_p, def_p = 1500, 2000, 1659
-        else:
-            min_p, max_p, def_p = 2000, 3000, 2400
-        f_rate = st.number_input(f"Rate (Rs/PSF)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
+        f_rate = st.number_input(f"Rate (Rs/PSF)", min_value=500, max_value=5000, value=def_rate_val, key=f"rate_val_{i}")
         
     floor_data.append({"floor": floor_label, "area": f_area, "layout": f_layout, "rate": f_rate})
     total_built_up += f_area
 
-# 🛠️ UPDATED FEATURE: 100% DYNAMIC CLIENT DEFINED ADDITIONAL WORK SCOPE
+# 🛠️ DYNAMIC CLIENT DEFINED ADDITIONAL WORK SCOPE
 st.write("---")
 st.subheader("➕ Step 3: Client Defined Additional Work Scope")
 st.caption("Client ki requirement ke mutabik scope ka naam aur cost yahan daalein. Toggle ON hone par hi table me dikhega.")
 
 additional_scopes = []
-
 for idx in range(3):
     st.markdown(f"**Custom Scope Item {idx+1}**")
     sc_col1, sc_col2, sc_col3 = st.columns([1.2, 2.3, 1.5])
@@ -124,14 +125,133 @@ for idx in range(3):
     if toggle_active and scope_name.strip():
         additional_scopes.append({"name": scope_name.strip(), "cost": scope_cost})
 
-st.write("---")
-custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
-additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized brand structural alignments, earthquake resistant RCC frame configuration, and comprehensive support services.")
-
-# MATHEMATICAL COMPUTATION (DYNAMIC INTEGRATION)
+# 🏗️ MATHEMATICAL PROJECT TOTALS
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 for scope in additional_scopes:
     net_project_cost += scope['cost']
+
+# 📊 14. SMART AUTO-GENERATED CONSTRUCTION STAGE PAYMENT LOGIC WITH SPEC RATIO BIFURCATION
+st.write("---")
+st.subheader("💳 Step 4: Smart Construction Stage Payments Calibration")
+st.caption("Aapke dynamic rates aur specified package ratio ke aadhar par system stage weightages auto-generate ho gayi hain.")
+
+# Package Wise Exact Cost Bifurcation Rules
+if "Solid Structure" in selected_global_display:
+    str_cost_spec, fin_cost_spec = 1199.0, 0.0
+elif "Essential" in selected_global_display:
+    str_cost_spec, fin_cost_spec = 1100.0, 600.0
+else: # Premium Luxury
+    str_cost_spec, fin_cost_spec = 1200.0, 1100.0
+
+total_cost_spec = str_cost_spec + fin_cost_spec
+structure_share = (str_cost_spec / total_cost_spec) * 100.0
+finishing_share = (fin_cost_spec / total_cost_spec) * 100.0
+
+# Fixed Milestones Values
+pct_booking = 6.0
+pct_foundation = 10.0
+pct_plinth = 6.0
+
+# Safety Guardrail for lower-tier allocations
+if structure_share < (pct_booking + pct_foundation + pct_plinth + 4.0):
+    structure_share = 100.0
+    finishing_share = 0.0
+
+remaining_structure = structure_share - (pct_booking + pct_foundation + pct_plinth)
+
+# Dynamic allocation rules for MEP and Plaster works from Structure balance
+if finishing_share > 0:
+    pct_mep_concealed = round(remaining_structure * 0.12, 2)
+    pct_plaster_work = round(remaining_structure * 0.20, 2)
+else:
+    # If solid structure core only package (finishing is 0%), dedicate more allocation weights to these stages
+    pct_mep_concealed = round(remaining_structure * 0.15, 2)
+    pct_plaster_work = round(remaining_structure * 0.25, 2)
+
+floor_pool_structure = remaining_structure - (pct_mep_concealed + pct_plaster_work)
+pct_per_floor = round(floor_pool_structure / total_floors, 2)
+
+# Dynamic Breakdown of Finishing Component (Only if finishing share is greater than zero)
+if finishing_share > 0:
+    pct_flooring = round(finishing_share * 0.38, 2)
+    pct_doors_win = round(finishing_share * 0.28, 2)
+    pct_paint_fixt = round(finishing_share * 0.22, 2)
+    pct_handover = round(finishing_share - (pct_flooring + pct_doors_win + pct_paint_fixt), 2)
+else:
+    pct_flooring, pct_doors_win, pct_paint_fixt, pct_handover = 0.0, 0.0, 0.0, 0.0
+
+# Base List Pipeline
+default_stages = [
+    {"stage": "Booking Advance Security Split", "desc": "Initial site mobilization, machinery logistics setup, and formal architectural layouts alignment.", "pct": pct_booking},
+    {"stage": "Foundation Base Infrastructure", "desc": "Complete deep excavation, PCC leveling layout, structural Column Footing mesh, and Foundation base casting.", "pct": pct_foundation},
+    {"stage": "Plinth Level Integration", "desc": "Plinth Beam structural frame execution, sand/internal aggregate filling, compaction, and specialized DPC sheet setup.", "pct": pct_plinth}
+]
+
+# Generate Dynamic combined stages for each floor as per core instruction rules
+for i in range(total_floors):
+    floor_label = "Ground Floor" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
+    default_stages.append({
+        "stage": f"{floor_label} Structure & Brickwork Combined",
+        "desc": f"Execution of vertical RCC columns, beam alignments, roof slab reinforcement grid casting, structural staircase layout, and complete outer/inner line bricks masonry work.",
+        "pct": pct_per_floor
+    })
+
+# In-Wall Conduits must complete before Plaster stage
+default_stages.append({
+    "stage": "Electrical & Plumbing In-Wall Concealed Works",
+    "desc": "Chasing/jiri layout in brick walls, structural placement of heavy PVC fire-retardant electrical conduits, and execution of internal pipeline water connectivity layout lines.",
+    "pct": pct_mep_concealed
+})
+
+default_stages.append({
+    "stage": "Floor-wise Internal & External Plaster Completion",
+    "desc": "Laying of precise rich-mortar cement internal surfaces plastering and synchronized outer high-strength weather-proof external finish plaster base layouts.",
+    "pct": pct_plaster_work
+})
+
+# Append finishing modules strictly only if package involves finishing allocations
+if finishing_share > 0:
+    default_stages.append({"stage": "Flooring & Architectural Tiling Work", "desc": "Installation of high-end vitrified tiling elements/granite layouts, premium bathroom floor-to-wall layouts, and counter setups.", "pct": pct_flooring})
+    default_stages.append({"stage": "Doors, Windows Frame & Security Railings", "desc": "Fixing durable perimeter frames, secure windows setups, high-strength inner flush door leaves, and architectural steel or glass handrails.", "pct": pct_doors_win})
+    default_stages.append({"stage": "Wall Smooth Putty, Base Paint & Premium Fixtures", "desc": "Dual coat structural wall putty treatment, base primers paint coatings, fixing designer modular switches, and structural sanitary systems execution.", "pct": pct_paint_fixt})
+    default_stages.append({"stage": "Final Detailing, Deep Cleaning & Keys Handover", "desc": "Thorough post-project deep cleaning operations, polishing verification, dynamic validation checklist oversight, and corporate site keys handover protocol.", "pct": pct_handover})
+
+# Administrative Percentage Controls Overrides Matrix
+edited_stages = []
+current_running_sum = 0.0
+
+st.markdown("#### ✏️ Administrative Stage Percentage Overrides Controls")
+for idx, stg in enumerate(default_stages):
+    if stg['pct'] > 0 or finishing_share > 0 or idx < (3 + total_floors + 2):
+        st_col1, st_col2 = st.columns([3.6, 1.4])
+        with st_col1:
+            st.markdown(f"**Stage {idx+1}:** {stg['stage']}  \n*{stg['desc']}*")
+        with st_col2:
+            val_override = st.number_input("Stage % Allocation", min_value=0.0, max_value=100.0, value=float(stg['pct']), step=0.01, key=f"stg_override_pct_{idx}")
+            edited_stages.append({"stage": stg['stage'], "desc": stg['desc'], "pct": val_override})
+            current_running_sum += val_override
+
+# Automatic Percentage Auto-Adjustment Engine for 100% calculation safety match
+current_running_sum = round(current_running_sum, 2)
+if current_running_sum != 100.0 and len(edited_stages) > 0:
+    difference_offset = round(100.0 - current_running_sum, 2)
+    edited_stages[-1]['pct'] = round(edited_stages[-1]['pct'] + difference_offset, 2)
+    current_running_sum = 100.0
+
+st.success("✅ Dynamic payment percentages synchronized seamlessly to 100.00% standard framework configuration!")
+
+# Render HTML Stage rows
+payment_schedule_rows = ""
+for idx, milestone in enumerate(edited_stages):
+    stage_calculated_cost = (milestone['pct'] / 100.0) * net_project_cost
+    payment_schedule_rows += f"""
+    <tr style="border-bottom: 1px solid #e5e7eb;">
+        <td style="padding: 10px; font-size: 12.5px; color: #111827; font-weight: 700; background-color: #fafafa; text-align: center;">{idx+1}</td>
+        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 700;">{milestone['stage']}</td>
+        <td style="padding: 10px; font-size: 12px; color: #4b5563; line-height:1.4;">{milestone['desc']}</td>
+        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 800; text-align: center; background-color: #f0fdf4;">{milestone['pct']:.2f}%</td>
+        <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
+    </tr>"""
 
 # 5. DYNAMIC IMAGE ASSIGNMENT LOGIC
 images_html = ""
@@ -147,25 +267,14 @@ elif "Essential" in selected_global_display:
         {"title": "🏙️ ACP Elevation", "file": "acp_elevation.jpg", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
         {"title": "MS Main Gate", "file": "ms_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
         {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"},
-        {"title": "Designer POP Cornice", "file": "pop_cornice.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
-        {"title": "Basic English WC", "file": "basic_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Basic Fitting Taps", "file": "basic_taps.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
-        {"title": "Basic Granite Slab", "file": "granite_slab.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"}
+        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&h=150&fit=crop"}
     ]
 else: # Premium Luxury
     img_data = [
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"},
         {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
         {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
-        {"title": "Glass Railing", "file": "glass_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
-        {"title": "Wall Hung WC", "file": "wall_hung_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Premium Diverter", "file": "diverter.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
-        {"title": "False Ceiling", "file": "false_ceiling.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
-        {"title": "SS Main Gate", "file": "ss_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "SS Staircase Railing", "file": "ss_staircase_railing.jpg", "url": "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?w=150&h=150&fit=crop"},
-        {"title": "Live CCTV System", "file": "cctv_system.jpg", "url": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=150&h=150&fit=crop"}
+        {"title": "Designer Wardrobe", "file": "designer_wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"}
     ]
 
 for img in img_data:
@@ -184,11 +293,8 @@ for img in img_data:
 brands_data = [
     {"name": "TATA Steel", "icon": "⛓️"}, {"name": "JINDAL Steel", "icon": "🏗️"},
     {"name": "UltraTech Cement", "icon": "🧱"}, {"name": "Ambuja Cement", "icon": "🦅"},
-    {"name": "ACC Cement", "icon": "💪"}, {"name": "Kajaria Tiles", "icon": "💎"},
-    {"name": "Action Tesa", "icon": "🪵"}, {"name": "Astral Pipes", "icon": "🚰"},
-    {"name": "Berger Paints", "icon": "🎨"}, {"name": "SAINIK 710 Ply", "icon": "🪓"},
-    {"name": "Greenply", "icon": "🌳"}, {"name": "Johnson Tiles", "icon": "🧱"},
-    {"name": "Anchor Panasonic", "icon": "🔌"}, {"name": "Somany Tiles", "icon": "✨"}
+    {"name": "Kajaria Tiles", "icon": "💎"}, {"name": "Astral Pipes", "icon": "🚰"},
+    {"name": "Berger Paints", "icon": "🎨"}, {"name": "Greenply", "icon": "🌳"}
 ]
 
 brands_html = ""
@@ -208,22 +314,16 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
         if pd.notna(spec) and "Excluded" not in str(spec):
             excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
 else:
-    elevation_text = "Plain Textured Render / Classic Paint Finish Elevation Layout." if "Solid Structure" in selected_global_display else "Premium Weather-Proof Aluminium Composite Panel (ACP) Grid Elevation Configuration." if "Essential" in selected_global_display else "Ultra-Luxury High-Pressure Laminate (HPL) Cladding mixed with Toughened Architectural Glass Profile."
     specs_list = [
-        ("Front Elevation Facade", elevation_text),
-        ("Structural Framework", "M25 Premium Grade heavy-duty machine concrete core with strict slump verification protocols."),
+        ("Structural Framework", "M25 Premium Grade heavy-duty machine concrete core with strict slump verification."),
         ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D steel layouts."),
-        ("Cement Infrastructure", "UltraTech Premium / Ambuja Kawach specialized weather-proof grade block casting & masonry binders."),
-        ("Masonry & Brickwork", "Premium Grade red clay bricks / high-strength autoclaved blocks cured dynamically."),
-        ("Plumbing & Drainage Network", "Concealed CPVC/UPVC architectural pipeline layouts via Astral or Finolex systems."),
-        ("Electrical Infrastructure", "Concealed heavy-duty fire-retardant wiring layouts using Polycab / Havells with modern sleek modular switch configurations."),
-        ("Premium Wall & Floor Finishes", "Vitrified large-format tiles (600x600mm / 800x800mm) by Kajaria, Somany, or Johnson tiles."),
-        ("Waterproofing Protocol", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions, bathrooms, and open terrace fields.")
+        ("Cement Infrastructure", "UltraTech Premium / Ambuja Kawach specialized weather-proof grade binders."),
+        ("Waterproofing Protocol", "Multi-layered advanced dynamic chemical waterproofing across all sunken regions and terrace fields.")
     ]
     for cat, spec in specs_list:
         excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
 
-# 8. FLOOR ROWS & CUSTOM SCOPES (VISIBLE ONLY IF ACTIVE)
+# 8. GENERAL BREAKDOWN TABLE DATA GENERATION
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -236,7 +336,6 @@ for item in floor_data:
         <td style="padding: 12px; font-size: 13px; color: #111827; text-align: right; font-weight: 700;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# APPENDING USER CUSTOM CLIENT DEFINED SCOPES
 for scope in additional_scopes:
     table_rows_html += f"""
     <tr style="border-bottom: 1px solid #e5e7eb; background-color: #f8fafc;">
@@ -247,7 +346,7 @@ for scope in additional_scopes:
         <td style="padding: 12px; font-size: 13px; color: #0f172a; text-align: right; font-weight: 700;">Rs. {scope['cost']:,.2f}</td>
     </tr>"""
 
-# 9. MULTI-PAGE STRUCTURED PROPOSAL DESIGN
+# 9. FINAL MULTI-PAGE PRESENTATION DESIGN ASSEMBLY
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
@@ -280,7 +379,7 @@ proposal_html = f"""
             </div>
         </div>
 
-        <div style="margin-top: 25px; background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; font-style: italic; font-size: 13.5px; color: #14532d; border-radius: 0 8px 8px 0; line-height: 1.5;">
+        <div style="margin-top: 25px; background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; font-style: italic; font-size: 13.5px; color: #14532d; border-radius: 0 8px 8px 0;">
             "<b>Director's Note:</b> {custom_note}"
         </div>
 
@@ -304,47 +403,55 @@ proposal_html = f"""
 
         <div style="margin-top: 25px; background-color: #111827; border-radius: 8px; padding: 18px; display: flex; justify-content: space-between; align-items: center; color: #ffffff;">
             <div>
-                <span style="font-size: 11px; color: #9ca3af; font-weight: 700; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Aggregated Investment Framework ({total_floors} Floors + Custom Client Add-ons)</span>
-                <span style="font-size: 12px; color: #38bdf8; font-weight: 700;">Includes All Structural Framework, Machineries, Material Inclusions & Supervision Elements.</span>
+                <span style="font-size: 11px; color: #9ca3af; font-weight: 700; display: block; text-transform: uppercase;">Aggregated Commercial Valuation Matrix</span>
+                <span style="font-size: 12px; color: #38bdf8; font-weight: 700;">Includes structural machinery, material supplies, and execution components.</span>
             </div>
             <div style="text-align: right;">
                 <span style="font-size: 22px; font-weight: 800; color: #38bdf8;">{formatted_total_cost}</span>
-                <span style="font-size: 11px; display: block; color: #9ca3af;">Net Investment (Inclusive of GST)</span>
+                <span style="font-size: 11px; display: block; color: #9ca3af;">Net Complete Investment Framework</span>
             </div>
         </div>
     </div>
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; page-break-after: always;">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 2. Visual Scope Material Inclusion Details</h3>
-        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">Following premium architectural finishing units stand included strictly within the customized contract outline framework:</p>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">💳 2. Smart Auto-Generated Stage Billing Milestone Matrix</h3>
+        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">The construction payouts are strictly calibrated in structured progress cycles matching structural or finishing dependencies safely:</p>
         
-        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #1f2937; color: #ffffff;">
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 40px;">S.No</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; width: 230px;">Milestone Stage</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase;">Detailed Technical Work Definition Scope</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: center; width: 80px;">Stage %</th>
+                    <th style="padding: 10px; font-size: 11.5px; text-transform: uppercase; text-align: right; width: 140px;">Due Amount (INR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {payment_schedule_rows}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">📸 3. Visual Scope Material Inclusion Details</h3>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top:10px;">
             {images_html}
         </div>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 30px;">🤝 3. Associated Corporate Material Ecosystem Brands</h3>
-        <p style="font-size: 12px; color: #4b5563; margin-top: 6px; margin-bottom: 15px;">We drive your luxury structure utilizing authentic supplies procured straight from India's benchmark production houses:</p>
-        
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: start; background: #ffffff; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 8px;">
-            {brands_html}
-        </div>
-    </div>
-
-    <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);;">
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0;">🛠️ 4. Technical Specifications & Material Directives</h3>
-        <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 12px;">
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛠️ 4. Technical Specifications & Material Directives</h3>
+        <ul style="padding-left: 18px; font-size: 12.5px; color: #374151; line-height: 1.6; margin-top: 10px;">
             {excel_specs_html}
         </ul>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 30px;">🛡️ 5. Commercial Execution Terms & Guarantees</h3>
-        <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; font-size: 12.5px; color: #78350f; line-height: 1.6;">
-            • <b>Commercial Scope Validity:</b> This estimation ledger remains legally locked and **valid for exactly 30 days** from signature date.<br>
-            • <b>Quality Controls:</b> Execution monitored via comprehensive **100+ point systematic checklists** handled daily by the resident engineering desk.<br>
-            • <b>Site Monitoring Provision:</b> Live 24x7 infrastructure camera lines deployed post initial earthwork to enable client transparent verification.<br>
+        <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">🛡️ 5. Commercial Execution Terms & Guarantees</h3>
+        <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; font-size: 12.5px; color: #78350f; line-height: 1.6; margin-top: 10px;">
+            • <b>Commercial Validity:</b> This document valuation parameters stand legally locked for 30 days from layout logging.<br>
+            • <b>Quality Controls:</b> Execution parameters tracked via comprehensive **100+ points system checklist** checks.<br>
             • <b>Strategic Accords:</b> {additional_reqs}
         </div>
 
-        <div style="margin-top: 45px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
+        <div style="margin-top: 40px; border-top: 2px solid #111827; padding-top: 20px; display: flex; justify-content: space-between; align-items: end; font-size: 12px; color: #4b5563;">
             <div>
                 <br><br><br>
                 <span style="font-size: 11px; color: #9ca3af; font-style: italic; display:block; margin-bottom:2px;">Signature of Executive Authority</span>
@@ -353,7 +460,6 @@ proposal_html = f"""
             <div style="text-align: right; line-height: 1.5; font-size: 12px; color: #111827;">
                 🏢 <b>Head Office:</b> New Delhi, NCR, India<br>
                 📞 <b>Contact Desk:</b> +91 8800614403, 9625803339<br>
-                📧 <b>Corporate Mail:</b> deeep1sharma@gmail.com<br>
                 🌐 <b>Digital Identity:</b> <a href="https://sbbt.in" style="color: #2563eb; text-decoration: none; font-weight: 700;">sbbt.in</a>
             </div>
         </div>
@@ -362,7 +468,7 @@ proposal_html = f"""
 </div>
 """
 
-# 10. PRINT CONFIGURATION COMPONENT
+# 10. PRINT INCLUSION MATRIX
 full_html_page = f"""<!DOCTYPE html><html><head><meta charset='utf-8'>
 <style>
 @media print {{
@@ -381,9 +487,9 @@ window.onload = function() {{
 </script>
 </body></html>"""
 
-# 11. UI INTERFACE DISPLAY
+# 11. SCREEN RENDERING PIPELINE
 st.write("### 💎 Live Executive Proposal Preview")
-st.caption("Aap niche diye gaye button par click karke direct formal multiple-page layout download kar sakte hain:")
+st.caption("Niche diye gaye component ke dwara live breakdown check karein ya print out page download karein:")
 
 st.download_button(
     label="📥 Download & Save Proposal Page",
