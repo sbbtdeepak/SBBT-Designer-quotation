@@ -26,7 +26,7 @@ if 'authenticated' not in st.session_state:
 
 if not st.session_state['authenticated']:
     st.title("🏗️ SBBT Enterprise Portal")
-    if st.button("Login"): # Simplified for test
+    if st.button("Login"):
         st.session_state['authenticated'] = True
         st.rerun()
     st.stop()
@@ -53,14 +53,14 @@ with col2:
 custom_note_text = st.text_area("Director's Note", "We are offering a special commercial advantage for your property...")
 additional_reqs_text = st.text_area("Extra Commitments", "Includes specialized brand structural alignments...")
 
-# 6. DYNAMIC IMAGE MAPPING (FIXED: POP Cornice moved to Essential)
+# 6. DYNAMIC IMAGE MAPPING (FIXED: POP Cornice is now in Essential)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_list = [{"title": "RCC Frame", "file": "rcc_frame.jpg"}]
 elif "Essential" in selected_global_display:
     img_list = [
         {"title": "ACP Elevation", "file": "acp_elevation.jpg"},
-        {"title": "POP Cornice", "file": "pop_cornice.jpg"}, # Moved here
+        {"title": "POP Cornice", "file": "pop_cornice.jpg"}, 
         {"title": "Flush Door", "file": "flush_door.jpg"}
     ]
 else: # Premium
@@ -74,23 +74,33 @@ for img in img_list:
     images_html += f"""
     <div style="text-align: center; width: 120px; margin: 5px; border: 1px solid #ccc; padding: 5px;">
         <img src="{get_image_source(img['file'])}" style="width: 100px; height: 80px; object-fit: cover;">
-        <div style="font-size: 10px;">{img['title']}</div>
+        <div style="font-size: 10px; font-weight: bold;">{img['title']}</div>
     </div>"""
 
-# 7. FINAL PROPOSAL GENERATION
+# 7. FINAL PROPOSAL HTML
 proposal_html = f"""
-<div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
-    <h1>SHREE BADREE BUILD TECH PVT. LTD.</h1>
-    <p><b>Client:</b> {client_name}</p>
-    <div style="background: #f0fdf4; padding: 15px;">
+<div style="font-family: sans-serif; padding: 30px; border: 2px solid #333; max-width: 800px; margin: auto;">
+    <h1 style="color: #111;">SHREE BADREE BUILD TECH PVT. LTD.</h1>
+    <p><b>Client Name:</b> {client_name}</p>
+    <div style="background: #f0fdf4; padding: 15px; border-left: 5px solid #16a34a;">
         <b>Director's Note:</b> {custom_note_text}
     </div>
-    <h3>Visual Scope Material Inclusion</h3>
+    
+    <h3 style="margin-top: 30px;">Visual Material Inclusions</h3>
     <div style="display: flex; flex-wrap: wrap;">{images_html}</div>
-    <hr>
-    <p><b>Extra Commitments:</b> {additional_reqs_text}</p>
+    
+    <hr style="margin: 30px 0;">
+    <p><b>Extra Strategic Commitments:</b></p>
+    <p style="font-size: 14px; color: #444;">{additional_reqs_text}</p>
 </div>
 """
 
 st.markdown(proposal_html, unsafe_allow_html=True)
-st.download_button("Download Proposal", data=proposal_html, file_name="proposal.html")
+
+# 8. DOWNLOAD BUTTON
+st.download_button(
+    label="📥 Download Proposal as HTML",
+    data=proposal_html,
+    file_name=f"SBBT_Proposal_{client_name}.html",
+    mime="text/html"
+)
