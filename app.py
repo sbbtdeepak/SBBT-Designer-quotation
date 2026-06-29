@@ -8,10 +8,6 @@ st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗�
 
 # IMAGE CONFIGURATION HELPER
 def get_image_source(file_name, fallback_url):
-    """
-    Agar 'images' folder mein local file milti hai toh use static asset ki tarah lift karega,
-    nahi toh fallback cloud URL chalega.
-    """
     local_path = os.path.join("images", file_name)
     if os.path.exists(local_path):
         return local_path
@@ -77,7 +73,7 @@ with col2:
 plot_area_ft_ref = plot_area_yd * 9
 
 st.write("---")
-# DYNAMIC USER FLOOR-WISE ENTRY WITH CUSTOM LAYOUT FIELD
+# DYNAMIC USER FLOOR-WISE ENTRY
 st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
 st.caption("Aap har floor ka Built-up Area, Layout Details (Text) aur Rate khud customize kar sakte hain:")
 
@@ -110,12 +106,12 @@ for i in range(total_floors):
 
 st.write("---")
 custom_note = st.text_area("Client Dedication Note", "We are offering a special commercial advantage for your property while maintaining premium specifications and long-term value, ensuring trust with zero compromises.")
-additional_reqs = st.text_area("Extra Strategic Commitments", "Includes 15+ luxury upgrades, earthquake resistant RCC frame configuration, and a comprehensive 2-Year AMC covering operational support.")
+additional_reqs = st.text_area("Extra Strategic Commitments", "Includes specialized upgrades, earthquake resistant RCC frame configuration, and a comprehensive 2-Year AMC covering operational support.")
 
 # MATHEMATICAL COMPUTATION
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (Local + Cloud Fallback)
+# 5. DYNAMIC IMAGE ASSIGNMENT LOGIC (AS PER PACKAGES DEFINED BY USER)
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_data = [
@@ -125,18 +121,26 @@ if "Solid Structure" in selected_global_display:
     ]
 elif "Essential" in selected_global_display:
     img_data = [
-        {"title": "Basic MS Gate Layout", "file": "ms_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
-        {"title": "Premium Internal Doors", "file": "doors.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
-        {"title": "Modern Front Elevation", "file": "elevation_essential.jpg", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"}
+        {"title": "MS Main Gate", "file": "ms_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
+        {"title": "MS Railing", "file": "ms_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
+        {"title": "Flush Door", "file": "flush_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "Designer POP Cornice", "file": "pop_cornice.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
+        {"title": "Basic English WC", "file": "basic_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
+        {"title": "Basic Fitting (Taps)", "file": "basic_taps.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
+        {"title": "Basic Kitchen Granite", "file": "kitchen_granite.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"}
     ]
-else:
+else: # Premium Luxury Profile
     img_data = [
-        {"title": "Modular Luxury Kitchen", "file": "kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
-        {"title": "Designer Wardrobes", "file": "wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
-        {"title": "Heavy Glass Railings", "file": "glass_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
-        {"title": "Wall-Hung WC Layout", "file": "toilet.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
-        {"title": "Automatic Elevator", "file": "elevator.jpg", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
-        {"title": "Bespoke False Ceiling", "file": "ceiling.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"}
+        {"title": "Designer Main Door", "file": "designer_main_door.jpg", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "Modular Kitchen", "file": "modular_kitchen.jpg", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
+        {"title": "Wardrobe", "file": "wardrobe.jpg", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
+        {"title": "Glass Railing", "file": "glass_railing.jpg", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
+        {"title": "Wall Hung WC", "file": "wall_hung_wc.jpg", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
+        {"title": "Diverter Fitting", "file": "diverter.jpg", "url": "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=150&h=150&fit=crop"},
+        {"title": "False Ceiling", "file": "false_ceiling.jpg", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"},
+        {"title": "SS Main Gate", "file": "ss_main_gate.jpg", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
+        {"title": "SS Staircase Railing", "file": "ss_staircase_railing.jpg", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
+        {"title": "CCTV Security System", "file": "cctv.jpg", "url": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=150&h=150&fit=crop"}
     ]
 
 for img in img_data:
@@ -215,7 +219,7 @@ proposal_html = f"""
     </div>
 
     <div style="margin-top: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background-color: #ffffff;">
-        <div style="font-weight: 700; font-size: 12px; color: #111827; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase;">📸 On-Site Execution Scope Framework:</div>
+        <div style="font-weight: 700; font-size: 12px; color: #111827; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; text-transform: uppercase;">📸 Finishes & Execution Scope Visualizations:</div>
         <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
             {images_html}
         </div>
@@ -252,6 +256,10 @@ proposal_html = f"""
     <div style="margin-top: 15px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 13px; color: #78350f;">
         <b>⚡ Executive Special Commitments & Guarantees:</b>
         <div style="color: #92400e; margin-top: 4px; font-size: 12px;">{additional_reqs}</div>
+    </div>
+
+    <div style="margin-top: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 12px; color: #4b5563;">
+        ⏳ <b>Commercial Notice:</b> This absolute construction quotation layout is highly strategic and remains strictly <b>valid for 30 days from the release date</b>.
     </div>
 
     <div style="margin-top: 20px; border-top: 1px dashed #e5e7eb; padding-top: 15px;">
