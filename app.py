@@ -66,9 +66,9 @@ with col2:
 plot_area_ft_ref = plot_area_yd * 9
 
 st.write("---")
-# DYNAMIC USER FLOOR-WISE ENTRY
+# DYNAMIC USER FLOOR-WISE ENTRY WITH CUSTOM LAYOUT FIELD
 st.subheader("📐 Step 2: Custom Floor Layout & Area Configuration")
-st.caption("Aap har floor ka Built-up Area aur Rate khud customize kar sakte hain:")
+st.caption("Aap har floor ka Built-up Area, Layout Details (Text) aur Rate khud customize kar sakte hain:")
 
 floor_data = []
 total_built_up = 0.0
@@ -77,21 +77,25 @@ for i in range(total_floors):
     floor_label = "Ground Floor / Stilt" if i == 0 else "First Floor" if i == 1 else "Second Floor" if i == 2 else "Third Floor" if i == 3 else f"{i}th Floor"
     
     st.markdown(f"#### 🏢 {floor_label}")
-    fl_col1, fl_col2 = st.columns(2)
+    fl_col1, fl_col2, fl_col3 = st.columns([1.5, 1.5, 1.5])
     
     with fl_col1:
-        f_area = st.number_input(f"Built Area for {floor_label} (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
+        f_area = st.number_input(f"Built Area (Sq.Ft)", min_value=50, max_value=10000, value=int(plot_area_ft_ref), key=f"area_val_{i}")
     
     with fl_col2:
+        # NEW FIELD: Enables text/numbers custom description for Layout column (Green Mark Area)
+        f_layout = st.text_input(f"Layout Configuration", value="3 BHK with Attach Bathroom" if i > 0 else "Stilt Parking + 1 Office", key=f"layout_val_{i}")
+        
+    with fl_col3:
         if "Solid Structure" in selected_global_display:
             min_p, max_p, def_p = 1100, 1500, 1199
         elif "Essential" in selected_global_display:
             min_p, max_p, def_p = 1500, 2000, 1699
         else:
             min_p, max_p, def_p = 2000, 3000, 2399
-        f_rate = st.number_input(f"Rate for {floor_label} (Rs/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
+        f_rate = st.number_input(f"Rate (Rs/PSF - GST Inc.)", min_value=min_p, max_value=max_p, value=def_p, key=f"rate_val_{i}")
         
-    floor_data.append({"floor": floor_label, "area": f_area, "rate": f_rate})
+    floor_data.append({"floor": floor_label, "area": f_area, "layout": f_layout, "rate": f_rate})
     total_built_up += f_area
 
 st.write("---")
@@ -152,18 +156,19 @@ else:
     else:
         excel_specs_html += "<li><b>Front Elevation:</b> Dynamic Modern HPL Cladding & ACP Sheet Framework.</li><li><b>Vertical Transit:</b> Premium 4-Passenger Automatic Elevator.</li><li><b>Finishing:</b> Heavy SS304 Top-Rail Glass Railing layout.</li>"
 
-# 8. TABLE DATA ROWS
+# 8. TABLE DATA ROWS WITH NEW LAYOUT COLUMN
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
     table_rows_html += f"""
     <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 500;">{item['floor']}</td>
+        <td style="padding: 10px; font-size: 13px; color: #2563eb; font-weight: 600;">{item['layout']}</td>
         <td style="padding: 10px; font-size: 13px; color: #4b5563; text-align: center;">{item['area']:,} Sq.Ft</td>
         <td style="padding: 10px; font-size: 13px; color: #111827; text-align: right; font-weight: 600;">Rs. {subtotal:,.2f}</td>
     </tr>"""
 
-# 9. SAFE HTML STRING CONSTRUCT (No trailing backslashes or character formatting conflicts)
+# 9. SAFE HTML STRING CONSTRUCT
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_built_up_str = f"{total_built_up:,} Total Built-up PSF"
 formatted_plot_ref_str = f"{plot_area_yd} Yd ({plot_area_ft_ref} Sq.Ft Ref)"
@@ -216,8 +221,9 @@ proposal_html = f"""
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background-color: #111827; color: #ffffff;">
-                    <th style="padding: 10px; font-size: 13px;">Floor Layout & Built Profile</th>
-                    <th style="padding: 10px; font-size: 13px; text-align: center;">Configured Area</th>
+                    <th style="padding: 10px; font-size: 13px;">Floor Profile Matrix</th>
+                    <th style="padding: 10px; font-size: 13px;">Layout & Configuration</th>
+                    <th style="padding: 10px; font-size: 13px; text-align: center;">Built Area</th>
                     <th style="padding: 10px; font-size: 13px; text-align: right;">Subtotal (INR)</th>
                 </tr>
             </thead>
