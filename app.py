@@ -123,7 +123,55 @@ additional_reqs = st.text_area("Additional Requirements / Custom Structural Comm
 total_built_up = plot_area_ft * total_floors
 net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
 
-# 6. DYNAMIC SPECIFICATIONS ENGINE
+# 6. DYNAMIC IMAGE CUTOUTS GENERATOR (Based on selection)
+# Note: In production, you can replace these placeholder image links with real SBBT project image URLs.
+images_html = "<div style='display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 15px; margin-bottom: 25px;'>"
+
+if "Solid Structure" in selected_global_display:
+    img_data = [
+        {"title": "RCC Core Frame", "url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=150&h=150&fit=crop"},
+        {"title": "Robust Brickwork", "url": "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=150&h=150&fit=crop"},
+        {"title": "Plaster Completed", "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop"}
+    ]
+elif "Essential" in selected_global_display:
+    img_data = [
+        {"title": "Basic MS Gate Layout", "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&h=150&fit=crop"},
+        {"title": "Premium Internal Doors", "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=150&h=150&fit=crop"},
+        {"title": "Modern Front Elevation", "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=150&h=150&fit=crop"}
+    ]
+else: # Premium Luxury
+    img_data = [
+        {"title": "Modular Luxury Kitchen", "url": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150&h=150&fit=crop"},
+        {"title": "Designer Wardrobes", "url": "https://images.unsplash.com/photo-1558882224-cca166733360?w=150&h=150&fit=crop"},
+        {"title": "Heavy Glass Railings", "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&h=150&fit=crop"},
+        {"title": "Wall-Hung WC & Diverter", "url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=150&h=150&fit=crop"},
+        {"title": "Automatic Elevator", "url": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=150&h=150&fit=crop"},
+        {"title": "Bespoke False Ceiling", "url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=150&h=150&fit=crop"}
+    ]
+
+for img in img_data:
+    images_html += f"""
+    <div style="text-align: center; width: 120px;">
+        <img src="{img['url']}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" alt="{img['title']}">
+        <div style="font-size: 11px; font-weight: 600; margin-top: 6px; color: #374151; line-height: 1.2;">{img['title']}</div>
+    </div>
+    """
+images_html += "</div>"
+
+# 7. BRANDS WE WORK WITH BLOCK
+brands_list = [
+    "Somany", "Nitco", "Kajaria", "Jaquar", "Hindware", "Cera", "Tata Tiscon", "Sail", 
+    "Kangaroo Ply", "Chivas Ply", "Havells", "Polycab", "Greenply", "Sainik Door", 
+    "Plaza Locks", "Godrej Locks", "Century Ply", "Astral Pipes", "Orient Electric", "Syntex"
+]
+brands_html = "<div style='margin-top: 25px; border-top: 2px solid #e5e7eb; padding-top: 15px;'>"
+brands_html += "<div style='font-weight: bold; font-size: 14px; color: #111827; margin-bottom: 10px; letter-spacing: 0.5px;'>🤝 PREMIUM ECOSYSTEM BRANDS WE TRUST & WORK WITH:</div>"
+brands_html += "<div style='display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start;'>"
+for brand in brands_list:
+    brands_html += f"<span style='background-color: #f3f4f6; color: #1f2937; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #e5e7eb;'>{brand}</span>"
+brands_html += "</div></div>"
+
+# 8. DYNAMIC EXCEL MATERIAL SPECIFICATIONS FETCHING WITH INTERACTIVE FALLBACKS
 excel_specs_html = ""
 if df_matrix is not None and selected_excel_col in df_matrix.columns:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ MATERIAL SPECIFICATIONS MATRIX FOR {selected_global_display.upper()} (LIVE FROM EXCEL):</div><ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
@@ -136,27 +184,20 @@ if df_matrix is not None and selected_excel_col in df_matrix.columns:
 else:
     excel_specs_html += f"<div style='margin-top:15px; font-weight:bold; color:#111827;'>🛡️ DETAILED MATERIAL SPECIFICATIONS MATRIX ({selected_global_display.upper()}):</div>"
     excel_specs_html += "<ul style='margin-top:8px; padding-left:20px; font-size:14px; color:#374151; line-height:1.6;'>"
-    
     if "Solid Structure" in selected_global_display:
         excel_specs_html += "<li><b>Scope Definition:</b> Pure Structural Grey Structure Core (Brickwork, RCC, Plastering only).</li>"
         excel_specs_html += "<li><b>Steel Layout:</b> Heavy Duty Rathi Fe500 / Kamdhenu structural reinforcement layout.</li>"
         excel_specs_html += "<li><b>Concrete Grade:</b> Certified M25 Design Mix RMC for columns, beams, and foundations.</li>"
-        excel_specs_html += "<li><b>Masonry Work:</b> First-Class high-strength AAC Blocks or traditional Grade-A Red Bricks.</li>"
-        excel_specs_html += "<li><b>Finishing Elements:</b> <span style='color:#ef4444; font-weight:600;'>Excluded (Core Structural Shell Only)</span>.</li>"
     elif "Essential" in selected_global_display:
         excel_specs_html += "<li><b>Scope Definition:</b> Structural Framework combined with Standard Functional Finishing Layout.</li>"
         excel_specs_html += "<li><b>Flooring Profiles:</b> Premium Vitrified tiles (2x2 or 4x2) in living areas and anti-skid floor setups.</li>"
-        excel_specs_html += "<li><b>Bathrooms Setup:</b> Standard Cera / Jaquar functional CP fittings and wall tiles up to 7ft.</li>"
-        excel_specs_html += "<li><b>Electrical Layout:</b> Fire-retardant Havells/Finolex wiring inside robust PVC conduits.</li>"
     else:
         excel_specs_html += "<li><b>Front Elevation:</b> Dynamic Modern HPL Cladding & ACP Sheet architectural framework.</li>"
         excel_specs_html += "<li><b>Vertical Transit:</b> Premium 4-Passenger Automatic Elevator completely embedded.</li>"
         excel_specs_html += "<li><b>Balconies & Stairs:</b> Heavy SS304 Top-Rail Glass Railing for 5 front layout openings.</li>"
-        excel_specs_html += "<li><b>Luxury Bathrooms:</b> Full Jaquar Diverter setups, premium Wall-Hung WCs, and Designer vanity assets.</li>"
-    
     excel_specs_html += "</ul>"
 
-# 7. GENERATING LIVE BREAKOUT ROWS
+# 9. GENERATING LIVE BREAKOUT ROWS
 table_rows_html = ""
 for item in floor_data:
     subtotal = item['area'] * item['rate']
@@ -169,7 +210,7 @@ for item in floor_data:
     </tr>
     """
 
-# 8. MASTER PROPOSAL HTML CONTAINER
+# MASTER PROPOSAL HTML CONTAINER
 proposal_html = f"""
 <div style="background-color: #ffffff; border: 2px solid #d1d5db; border-radius: 8px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; color: #111827; max-width: 850px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
     
@@ -194,6 +235,12 @@ proposal_html = f"""
 
     <div style="margin-top: 22px; background-color: #f3f4f6; border-left: 4px solid #2563eb; padding: 15px; font-style: italic; font-size: 14px; color: #1f2937; border-radius: 0 4px 4px 0;">
         "{custom_note}"
+    </div>
+
+    <!-- DYNAMIC VISUAL CUTOUTS INJECTED HERE -->
+    <div style="margin-top: 25px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 15px; background-color: #fafafa;">
+        <div style="font-weight: bold; font-size: 14px; color: #111827; margin-bottom: 10px; text-align: center; letter-spacing: 0.5px;">📸 ON-SITE WORK & MATERIAL DELIVERY HIGHLIGHTS:</div>
+        {images_html}
     </div>
 
     <div style="margin-top: 25px;">
@@ -227,12 +274,14 @@ proposal_html = f"""
         {excel_specs_html}
     </div>
 
+    <!-- BRANDS ECOSYSTEM SECTION -->
+    {brands_html}
+
     <div style="margin-top: 25px; border-top: 1px dashed #cfd5db; padding-top: 20px; font-size: 13px; color: #4b5563; line-height: 1.6;">
         <b>🛡️ CORE STANDARD INCLUSIONS ACROSS ALL SCOPES:</b>
         <ul style="margin: 6px 0 0 0; padding-left: 20px;">
             <li><b>Heavy Duty Structural Core:</b> Complete RCC framework designed for highest seismic safety standards using RMC M25 Concrete and premium Rathi Fe500 steel layout.</li>
             <li><b>High-Grade Masonry:</b> Premium internal & external block work built with durable AAC Blocks or classic Red Bricks wrapped in rich cement mortar plaster.</li>
-            <li><b>Quality Governance:</b> End-to-end transparent processing with detailed material checklists, continuous site monitoring, and formal project tracking.</li>
         </ul>
     </div>
 
@@ -252,14 +301,13 @@ proposal_html = f"""
 </div>
 """
 
-# Safe standalone page layout without Python f-string conflict
+# HTML Download Wrapper
 full_html_page = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='margin:0; padding:20px; background-color:#ffffff;'>{proposal_html}</body></html>"
 
-# 9. LIVE PREVIEW & DOWNLOAD
+# 10. LIVE DASHBOARD INTERFACE
 st.write("---")
 st.write("### 📈 SBBT Official Commercial Proposal")
 
-# Safe Native Streamlit Download Button
 st.download_button(
     label="📥 Download Designer Proposal (.html)",
     data=full_html_page,
