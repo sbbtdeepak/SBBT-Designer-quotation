@@ -15,7 +15,12 @@ def get_image_source(file_name):
 # 2. AUTOMATIC MATRIX LOADER
 @st.cache_data
 def load_sbbt_matrix():
-    possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "SBBT_Master_Quotation_Matrix.XLSX", "sbbt_master_quotation_matrix.xlsx"]
+    possible_files = [
+        "SBBT_Master_Quotation_Matrix.xlsx",
+        "SBBT_Master_Quotation_Matrix.xlsx.xlsx",
+        "SBBT_Master_Quotation_Matrix.XLSX",
+        "sbbt_master_quotation_matrix.xlsx"
+    ]
     for file_name in possible_files:
         if os.path.exists(file_name):
             try:
@@ -24,8 +29,10 @@ def load_sbbt_matrix():
                 if sheet_target not in xl.sheet_names:
                     sheet_target = xl.sheet_names[0]
                 return pd.read_excel(file_name, sheet_name=sheet_target)
-            except Exception:
+            except Exception as e:
+                st.warning(f"Matrix load issue in {file_name}: {e}")
                 continue
+    st.warning("SBBT Matrix file not found. Using default specifications.")
     return None
 
 df_matrix = load_sbbt_matrix()
