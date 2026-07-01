@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import datetime
 import os
+import gspread
 
 # 1. PAGE SETUP & THEME
 st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
