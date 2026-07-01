@@ -3,67 +3,64 @@ import pandas as pd
 import datetime
 import os
 
-# 1. PAGE SETUP
-st.set_page_config(page_title="SBBT Proposal Engine", layout="centered")
+# --- 1. PAGE SETUP ---
+st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
 
-# 2. SAFE MATRIX LOADER (Crash nahi hoga)
+# --- 2. IMAGE HELPER ---
+def get_image_source(file_name):
+    return f"https://raw.githubusercontent.com/sbbtdeepak/SBBT-Designer-quotation/main/images/{file_name}"
+
+# --- 3. MATRIX LOADER (Jaisa pehle tha) ---
 @st.cache_data
 def load_sbbt_matrix():
-    file_name = "SBBT_Master_Quotation_Matrix.xlsx"
-    if not os.path.exists(file_name):
-        return None
-    try:
-        # Pura data read karein
-        df = pd.read_excel(file_name, sheet_name="AI Master Matrix")
-        return df
-    except:
-        return None
+    possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "SBBT_Master_Quotation_Matrix.XLSX", "sbbt_master_quotation_matrix.xlsx"]
+    for file_name in possible_files:
+        if os.path.exists(file_name):
+            try:
+                xl = pd.ExcelFile(file_name)
+                sheet_target = "AI Master Matrix"
+                if sheet_target not in xl.sheet_names: sheet_target = xl.sheet_names[0]
+                return pd.read_excel(file_name, sheet_name=sheet_target)
+            except: continue
+    return None
 
 df_matrix = load_sbbt_matrix()
 
-# 3. AUTHENTICATION GATEWAY
+# --- 4. AUTHENTICATION & ENGINE (Aapka original logic) ---
 if 'authenticated' not in st.session_state: st.session_state['authenticated'] = False
 if not st.session_state['authenticated']:
-    st.title("🏗️ SBBT Enterprise Login")
-    if st.button("Enter Portal"):
-        st.session_state['authenticated'] = True
-        st.rerun()
+    # [Aapka original login code yahan waisa ka waisa rahega]
+    st.title("🏗️ SBBT Enterprise Portal")
+    # ... (Login logic) ...
     st.stop()
 
-# --- ENGINE LOGIC START ---
-# (Yahan apna purana 'Engine Controls', 'Floor Area' inputs wahi rakhein)
-# ...
+# --- 5. CALCULATIONS (Aapka original code) ---
+# [Floor data, Additional scope, Total Cost calculation wahi rahega]
 
-# 4. DYNAMIC SPECIFICATION TABLE (Safely)
-spec_table_html = "<p>Data not loaded from Excel.</p>"
-if df_matrix is not None:
-    # Column name match hona chahiye
-    package_col = selected_excel_col # 'Premium Luxury Package' etc
-    if package_col in df_matrix.columns:
-        table_rows = "".join([f"<tr><td style='border:1px solid #ddd; padding:8px;'>{row.get('Category / Element', '')}</td><td style='border:1px solid #ddd; padding:8px;'>{row.get(package_col, '')}</td></tr>" for _, row in df_matrix.iterrows()])
-        spec_table_html = f"<table style='width:100%; border-collapse:collapse;'>{table_rows}</table>"
+# --- 6. MILESTONE MATRIX (Ise PDF generation se just pehle generate karein) ---
+milestone_html = ""
+if final_ok_switch: # Aapka original switch variable
+    milestone_html = f"""
+    <div style="margin-top: 50px; padding: 20px; border: 2px solid #2563eb; border-radius: 10px; background: #eff6ff;">
+        <h3>💳 Payment Milestone Matrix</h3>
+        <p>Total Estimated: <b>Rs. {net_project_cost:,.2f}</b></p>
+        <ul>
+            <li>Structure Stage: 40%</li>
+            <li>Finishing Stage: 40%</li>
+            <li>Handover: 20%</li>
+        </ul>
+    </div>
+    """
 
-# 5. MILESTONE MATRIX (BILKUL NICHE)
-milestone_html = f"""
-<div style="margin-top: 50px; padding: 20px; border: 2px solid #2563eb; border-radius: 10px; background: #eff6ff;">
-    <h3>💳 Payment Milestone Matrix</h3>
-    <p>Total Estimated: <b>Rs. {net_project_cost:,.2f}</b></p>
-    <ul>
-        <li>Structure: 40% | Finishing: 40% | Handover: 20%</li>
-    </ul>
-</div>
-"""
-
-# 6. HTML ASSEMBLY
+# --- 7. PROPOSAL HTML ASSEMBLY (Milestone ko niche add kiya) ---
 proposal_html = f"""
-<div style="font-family: Arial;">
-    <h1>Proposal for {client_name}</h1>
-    <h2>Specifications</h2>
-    {spec_table_html}
+<div style="font-family: sans-serif; padding: 20px;">
+    <h1>SBBT Executive Proposal</h1>
     {milestone_html}
-</div>
+    
+    </div>
 """
 
-# 7. DOWNLOAD & PREVIEW
-st.download_button("📥 Download Proposal", proposal_html, "SBBT_Proposal.html", "text/html")
+# --- 8. DOWNLOAD & PREVIEW (Original) ---
+st.download_button("📥 Download Proposal", proposal_html, "Proposal.html", "text/html")
 st.markdown(proposal_html, unsafe_allow_html=True)
