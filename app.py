@@ -15,28 +15,70 @@ def get_image_source(file_name):
 # 2. AUTOMATIC MATRIX LOADER
 @st.cache_data
 def load_sbbt_matrix():
-    possible_files = [
-        "SBBT_Master_Quotation_Matrix.xlsx",
-        "SBBT_Master_Quotation_Matrix.xlsx.xlsx",
-        "SBBT_Master_Quotation_Matrix.XLSX",
-        "sbbt_master_quotation_matrix.xlsx"
-    ]
-    for file_name in possible_files:
-        if os.path.exists(file_name):
-            try:
-                xl = pd.ExcelFile(file_name)
-                sheet_target = "AI Master Matrix"
-                if sheet_target not in xl.sheet_names:
-                    sheet_target = xl.sheet_names[0]
-                return pd.read_excel(file_name, sheet_name=sheet_target)
-            except Exception as e:
-                st.warning(f"Matrix load issue in {file_name}: {e}")
-                continue
-    st.warning("SBBT Matrix file not found. Using default specifications.")
-    return None
 
-df_matrix = load_sbbt_matrix()
+    file_name="SBBT_Master_Quotation_Matrix.xlsx"
 
+    try:
+
+        if not os.path.exists(file_name):
+            st.error(f"❌ File not found: {file_name}")
+            return None
+
+        xl=pd.ExcelFile(file_name)
+
+        sheet_target="AI Master Matrix"
+
+        if sheet_target not in xl.sheet_names:
+            sheet_target=xl.sheet_names[0]
+
+        # Detect header automatically
+        raw_df = pd.read_excel(
+            file_name,
+            sheet_name=sheet_target,
+            header=None
+        )
+
+        header_row=None
+
+        for i,row in raw_df.iterrows():
+
+            row_values=row.astype(str).str.strip().tolist()
+
+            if "Category / Element" in row_values:
+                header_row=i
+                break
+
+        if header_row is None:
+            st.error("❌ 'Category / Element' header not found")
+            return None
+
+        # Reload with detected header
+        df=pd.read_excel(
+            file_name,
+            sheet_name=sheet_target,
+            header=header_row
+        )
+
+        df=df.dropna(how="all")
+
+        df.columns=(
+            df.columns
+            .astype(str)
+            .str.strip()
+        )
+
+        st.success("✅ Matrix loaded")
+
+        return df
+
+    except Exception as e:
+
+        st.error(f"Excel Error: {e}")
+
+        return None
+
+
+df_matrix=load_sbbt_matrix() 
 # 3. AUTHENTICATION GATEWAY
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
@@ -281,23 +323,49 @@ for brand in brands_data:
     </div>"""
 
 # SPECIFICATIONS LI GENERATION
-excel_specs_html = ""
-if df_matrix is not None and selected_excel_col in df_matrix.columns:
-    for idx, row in df_matrix.iterrows():
-        cat = row['Category / Element'] if 'Category / Element' in df_matrix.columns else row.iloc[0]
-        spec = row[selected_excel_col]
-        if pd.notna(spec) and "Excluded" not in str(spec):
-            excel_specs_html += f"<li style='margin-bottom:6px;'><b>{cat}:</b> {spec}</li>"
-else:
-    specs_list = [
-        ("Structural Framework Elements", "M25 Premium Grade machine concrete core with strict engineering structural checks."),
-        ("Steel & Core Reinforcement", "Exclusively TATA Tiscon / JINDAL Panther high-tensile structural TMT Fe-550D configurations."),
-        ("Cement Infrastructure Base", "UltraTech Premium / Ambuja Kawach specialized high-strength layers."),
-        ("Waterproofing Protocol Systems", "Multi-layered advanced dynamic chemical waterproofing across all structural layouts.")
-    ]
-    for cat, spec in specs_list:
-        excel_specs_html += f"<li style='margin-bottom:7px;'><b>{cat}:</b> {spec}</li>"
+excel_specs_html=""
 
+if df_matrix is not None:
+
+    if selected_excel_col in df_matrix.columns:
+
+        for _,row in df_matrix.iterrows():
+
+            category=row.get("Category / Element")
+            specification=row.get(selected_excel_col)
+
+            if (
+                pd.notna(category)
+                and pd.notna(specification)
+                and str(specification).strip()!=""
+                and "excluded" not in str(specification).lower()
+            ):
+
+                excel_specs_html += f"""
+                <li style='margin-bottom:8px;'>
+                <b>{category}</b>: {specification}
+                </li>
+                """
+
+    else:
+
+        st.error(
+            f"❌ Package column not found: {selected_excel_col}"
+        )
+
+        st.write(
+            "Available Columns:"
+        )
+
+        st.write(
+            df_matrix.columns.tolist()
+        )
+
+else:
+
+    excel_specs_html="""
+    <li>No package specifications loaded.</li>
+    """
 # FLOOR COST ROW TABLE
 table_rows_html = ""
 for item in floor_data:
