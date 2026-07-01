@@ -213,7 +213,7 @@ for idx, milestone in enumerate(edited_stages):
         <td style="padding: 10px; font-size: 13px; color: #111827; font-weight: 800; text-align: right;">Rs. {stage_calculated_cost:,.2f}</td>
     </tr>"""
 
-# COMPLETE DYNAMIC IMAGES MAPPING FROM YOUR REPOSITORY LIST
+# COMPLETE DYNAMIC IMAGES MAPPING
 images_html = ""
 if "Solid Structure" in selected_global_display:
     img_list = [
@@ -230,9 +230,10 @@ elif "Essential" in selected_global_display:
         {"title": "MS Railing Setup", "file": "ms_railing.jpg"},
         {"title": "Flush Door System", "file": "flush_door.jpg"},
         {"title": "Basic CP Taps", "file": "basic_taps.jpg"},
-        {"title": "Standard WC", "file": "basic_wc.jpg"}
+        {"title": "Standard WC", "file": "basic_wc.jpg"},
+        {"title": "Pop Cornice Styling", "file": "pop_cornice.jpg"} # CHANGE 1: Added here
     ]
-else: # Premium Luxury Profile Package - Mapping All Ultra Luxury Assets
+else:
     img_list = [
         {"title": "🏛️ HPL Cladding Elevation", "file": "hpl_cladding.jpg"},
         {"title": "Stainless Steel Gate", "file": "ss_main_gate.jpg"},
@@ -316,7 +317,7 @@ for scope in additional_scopes:
 formatted_total_cost = f"Rs. {net_project_cost:,.2f}"
 formatted_plot_ref_str = f"{plot_area_yd} Sq. Yards ({plot_area_ft_ref} Sq.Ft Reference Frame)"
 
-# TOGGLE CONDITIONAL BLOCK GENERATION (ON = FULL SHOW, OFF = FULL GAYAB)
+# MILESTONE SECTION (CHANGE 2: Kept as is, will place in proposal_html below Section 7)
 milestone_section_html = ""
 if final_ok_switch:
     milestone_section_html = f"""
@@ -340,7 +341,7 @@ if final_ok_switch:
     </div>
     """
 
-# DYNAMIC PROPOSAL ASSEMBLY (Fixed variables mapping error)
+# DYNAMIC PROPOSAL ASSEMBLY 
 proposal_html = f"""
 <div style="background-color: #ffffff; color: #111827; font-family: 'Segoe UI', Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 10px;">
     
@@ -403,8 +404,6 @@ proposal_html = f"""
         </div>
     </div>
 
-    {milestone_section_html}
-
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px;">
         <h3 style="font-size: 14px; font-weight: 800; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; text-transform: uppercase;">🛡️ 3. CORE STRUCTURAL COMPLIANCE & QUALITY ASSURANCES</h3>
         <p style="font-size: 12.5px; color: #374151; line-height: 1.6;">Shree Badree Build Tech follows national safety protocols strictly via Indian Standard codes:</p>
@@ -443,7 +442,8 @@ proposal_html = f"""
             • <b>Commercial Validity:</b> Locked for 30 days from layout mapping.<br>
             • <b>Strategic Accords:</b> {additional_reqs_text}
         </div>
-    </div>
+        
+        {milestone_section_html} </div>
 
     <div style="border: 1px solid #d1d5db; border-radius: 12px; padding: 35px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-top: 30px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #4b5563;">
