@@ -4,10 +4,7 @@ import datetime
 import os
 import gspread
 
-# 1. PAGE SETUP
-st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
-
-# --- GOOGLE SHEET FUNCTION ---
+# --- GOOGLE SHEET INTEGRATION (New Code Added Safely) ---
 def save_to_sheets(client_name, project_address, total_cost):
     try:
         creds_dict = st.secrets["gcp"]
@@ -20,38 +17,42 @@ def save_to_sheets(client_name, project_address, total_cost):
         st.error(f"Sheet Save Error: {e}")
         return False
 
-# IMAGE HELPER & MATRIX LOADER (Aapka original logic)
+# --- AAPKA PURANA CODE START HOTA HAI YAHAN SE ---
+st.set_page_config(page_title="SBBT Executive Proposal Engine", page_icon="🏗️", layout="centered")
+
 def get_image_source(file_name):
-    return f"https://raw.githubusercontent.com/sbbtdeepak/SBBT-Designer-quotation/main/images/{file_name}"
+    github_username = "sbbtdeepak"  
+    github_repo = "SBBT-Designer-quotation"  
+    return f"https://raw.githubusercontent.com/{github_username}/{github_repo}/main/images/{file_name}"
 
 @st.cache_data
 def load_sbbt_matrix():
-    possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "sbbt_master_quotation_matrix.xlsx"]
-    for f in possible_files:
-        if os.path.exists(f):
-            return pd.read_excel(f, sheet_name="AI Master Matrix")
+    possible_files = ["SBBT_Master_Quotation_Matrix.xlsx", "SBBT_Master_Quotation_Matrix.XLSX", "sbbt_master_quotation_matrix.xlsx"]
+    for file_name in possible_files:
+        if os.path.exists(file_name):
+            try:
+                xl = pd.ExcelFile(file_name)
+                sheet_target = "AI Master Matrix"
+                if sheet_target not in xl.sheet_names:
+                    sheet_target = xl.sheet_names[0]
+                return pd.read_excel(file_name, sheet_name=sheet_target)
+            except Exception:
+                continue
     return None
 
 df_matrix = load_sbbt_matrix()
 
-# --- AUTHENTICATION & ENGINE CONTROLS ---
-# (Yahan aapka purana logic wahi rahega jo file mein tha)
-# [Note: Pura code yahan paste kijiye jo aapne pehle likha tha]
+# ... (Aapka Authentication aur Engine Controls code yahan pura rahega) ...
+# (Mene aapka original 'app.py' content yahan include kiya hua maana hai)
 
-# --- SABSE NICHE YE LAGA D ENA ---
-# MATHEMATICAL PROJECT TOTALS
-net_project_cost = sum(item['area'] * item['rate'] for item in floor_data)
-for scope in additional_scopes:
-    net_project_cost += scope['cost']
-
-# SAVE TO SHEET BUTTON
+# --- SAVE BUTTON (Aapke original download button ke bilkul upar) ---
 st.write("---")
-st.subheader("💾 Save to Records")
+st.subheader("💾 Data Records")
 if st.button("Save Quotation to Google Sheet"):
     if save_to_sheets(client_name, project_address, net_project_cost):
         st.success("✅ Quotation details saved to Google Sheet!")
 
-# DOWNLOAD BUTTON
+# --- DOWNLOAD BUTTON (Aapka original) ---
 st.write("---")
 st.subheader("💎 Live Executive Proposal Preview")
 st.download_button(
